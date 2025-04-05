@@ -110,31 +110,33 @@ export class Chess {
             if(board[row][col] !== null) {
                 if(board[row][col].color !== this.currentPlayer) {
                     if(this.currentPiece.canAttack(board, {row: row, col: col})) {
-                        this.attack(this.currentPiece, board[row][col]);
-                        this.addPosToHistory(row, col);
+                        this.attack(board[row][col]);
                     }
                 }
             } else {
                 if(this.currentPiece.canMove(board, {row: row, col: col})) {
-
-                    board[row][col] = this.currentPiece;
-                    board[this.currentPiece.row][this.currentPiece.col] = null;
-                    this.currentPiece.row = row;
-                    this.currentPiece.col = col;
-                    this.setSquareInactive();
-                    this.drawBoard();
-                    this.addPosToHistory(row, col);
+                    this.move(row, col);
                 }
-                
             }
         }
     }
 
-    attack(piece, target) {
-        board[target.row][target.col] = piece;
-        board[piece.row][piece.col] = null;
-        piece.row = target.row;
-        piece.col = target.col;
+    move(row, col) {
+        board[row][col] = this.currentPiece;
+        board[this.currentPiece.row][this.currentPiece.col] = null;
+        this.currentPiece.row = row;
+        this.currentPiece.col = col;
+        this.setSquareInactive();
         this.drawBoard();
+        this.addPosToHistory(row, col);
+    }
+
+    attack(target) {
+        board[target.row][target.col] = this.currentPiece;
+        board[this.currentPiece.row][this.currentPiece.col] = null;
+        this.currentPiece.row = target.row;
+        this.currentPiece.col = target.col;
+        this.drawBoard();
+        this.addPosToHistory(target.row, target.col);
     }
 }
