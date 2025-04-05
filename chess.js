@@ -1,0 +1,140 @@
+import { Player } from "./player.js";
+import { Pawn } from "./piece.js";
+
+const board = [];
+
+const boardHolder = document.getElementById("board");
+
+export class Chess {
+    constructor() {
+        this.player_1 = new Player("Player 1");
+        this.player_2 = null;
+        this.board = [];
+        this.currentPlayer = "w"; // player 0 = white, player 1 = black
+        this.currentPiece = null;
+        this.winner = null;
+        this.gameOver = false;
+        this.moveHistory = [];
+
+        this.placePieces();
+        this.drawBoard();
+    }
+
+    placePieces() {
+        for (let i = 0; i < 8; i++) {
+            board[i] = [];
+            for (let j = 0; j < 8; j++) {
+                if(i === 1) {
+                    board[i][j] = new Pawn("b", {row: i, col: j});
+                } else if(i === 6) {
+                    board[i][j] = new Pawn("w", {row: i, col: j});
+                } else board[i][j] = null;
+            }
+        }
+    }
+
+    drawBoard() {
+        boardHolder.innerHTML = ""; // clear board
+        for(let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                const square = document.createElement("div");
+                square.className = "square";
+                square.dataset.row = i;
+                square.dataset.col = j;
+                square.style.backgroundColor = (i + j) % 2 === 0 ? "#eee" : "#444";
+                square.addEventListener("click", () => this.handleUserClick(i, j));
+                if (board[i][j] !== null) {
+                    const img = document.createElement("img");
+                    img.src = board[i][j].img;
+                    img.alt = board[i][j].name;
+                    img.className = "piece"; 
+                    square.appendChild(img);
+                }
+                boardHolder.appendChild(square);
+            }
+        }
+    }
+
+    setSquareActive(row, col, piece) {
+        this.currentPiece = piece;
+        document.querySelectorAll(".square").forEach(square => {
+            const r = parseInt(square.dataset.row);
+            const c = parseInt(square.dataset.col);
+            square.style.backgroundColor = (r + c) % 2 === 0 ? "#eee" : "#444";
+        });
+        const index = row * 8 + col;
+            const square = document.querySelectorAll(".square")[index];
+            square.style.backgroundColor = "green";
+    }
+    setSquareInactive() {
+        this.currentPiece = null;
+        document.querySelectorAll(".square").forEach(square => {
+            const r = parseInt(square.dataset.row);
+            const c = parseInt(square.dataset.col);
+            square.style.backgroundColor = (r + c) % 2 === 0 ? "#eee" : "#444";
+        });
+    }
+
+    addPosToHistory(row, col) {
+        const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        const from = files[col] + (8 - row);
+        const to = files[col] + (8 - row);
+        const move = `${from} → ${to}`;
+        this.moveHistory.push(move);
+        console.log(move);
+        this.drawHistory();
+    }
+
+    drawHistory() {
+        const historyEl = document.getElementById("history-list");
+        historyEl.innerHTML = "";
+        this.moveHistory.forEach((move, index) => {
+            const li = document.createElement("li");
+            li.textContent = `${index + 1}. ${move}`;
+            historyEl.appendChild(li);
+        });
+    }
+
+    handleUserClick(row, col) {
+        if (this.gameOver) return;
+        if(this.currentPiece === null ||  (board[row][col] !== null && board[row][col].color === this.currentPlayer)) {
+            if(board[row][col] !== null){
+                if(board[row][col].color !== this.currentPlayer) {
+                    alert("You can only move your own pieces!");
+                    return;
+                    
+                }
+            }else return;
+            this.setSquareActive(row, col, board[row][col]);
+        } else {
+            if(board[row][col] !== null) {
+                if(board[row][col].color !== this.currentPlayer) {
+                    if(this.currentPiece.canAttack(board, {row: row, col: col})) {
+                        this.attack(this.currentPiece, board[row][col]);
+                        this.addPosToHistory(row, col);
+                    }
+                }
+            } else {
+                if(this.currentPiece.canMove(board, {row: row, col: col})) {
+
+                    board[row][col] = this.currentPiece;
+                    board[this.currentPiece.row][this.currentPiece.col] = null;
+                    this.currentPiece.row = row;
+                    this.currentPiece.col = col;
+                    this.setSquareInactive();
+                    this.drawBoard();
+                    this.addPosToHistory(row, col);
+                }
+                
+            }
+        }
+    }
+
+    attack(piece, target) {
+        board[target.row][target.col] = piece;
+        board[piece.row][piece.col] = null;
+        piece.row = target.row;
+        piece.col = target.col;
+        this.drawBoard();
+    }
+}
