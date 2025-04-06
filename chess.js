@@ -1,5 +1,5 @@
 import { Player } from "./player.js";
-import { Pawn, Rook, Knight, Bishop, Queen } from "./piece.js";
+import { Pawn, Rook, Knight, Bishop, Queen, King } from "./piece.js";
 
 const board = [];
 
@@ -31,11 +31,13 @@ export class Chess {
                     else if(j === 1 || j === 6) board[i][j] = new Knight("b", {row: i, col: j});
                     else if(j === 2 || j === 5) board[i][j] = new Bishop("b", {row: i, col: j});
                     else if(j === 3) board[i][j] = new Queen("b", {row: i, col: j});
+                    else if(j === 4) board[i][j] = new King("b", {row: i, col: j});
                     else board[i][j] = null;
                 } else if(i === 7){
                     if(j === 0 ||j === 7) board[i][j] = new Rook("w", {row: i, col: j});
                     else if(j === 1 || j === 6) board[i][j] = new Knight("w", {row: i, col: j});
                     else if(j === 2 || j === 5) board[i][j] = new Bishop("w", {row: i, col: j});
+                    else if(j === 3) board[i][j] = new King("w", {row: i, col: j});
                     else if(j === 4) board[i][j] = new Queen("w", {row: i, col: j});
                     else board[i][j] = null;
                 }else board[i][j] = null;

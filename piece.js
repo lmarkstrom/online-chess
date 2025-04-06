@@ -162,3 +162,20 @@ export class Queen extends Piece {
         return this.canMove(board, newPos); 
     }
 }
+
+export class King extends Piece {
+    constructor(color, pos) {
+        super("king", color, pos);
+    }
+    canMove(board, newPos) {
+        const rowDiff = Math.abs(this.row - newPos.row);
+        const colDiff = Math.abs(this.col - newPos.col);
+        if(rowDiff <= 1 && colDiff <= 1) {
+            return true; 
+        }
+        return false; 
+    }
+    canAttack(board, newPos) {
+        return this.canMove(board, newPos); 
+    }
+}
