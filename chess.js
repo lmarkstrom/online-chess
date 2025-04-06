@@ -148,6 +148,7 @@ export class Chess {
         board[this.currentPiece.row][this.currentPiece.col] = null;
         this.currentPiece.row = target.row;
         this.currentPiece.col = target.col;
+        this.setSquareInactive();
         this.drawBoard();
         this.addPosToHistory(target.row, target.col);
     }
