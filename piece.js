@@ -20,17 +20,24 @@ export class Pawn extends Piece {
         const direction = this.color === "w" ? 1 : -1;
         const startRow = this.color === "w" ? 6 : 1;
         const distance = Math.abs(this.row - newPos.row);
+        console.log(direction);
+        console.log(distance);
+        console.log(startRow);
+        if(this.row - newPos.row )
         if(this.row !== startRow && distance === 2) return false; // Max 2 steg
-        if((this.row - newPos.row < direction) || (this.row - newPos.row > direction*2)) return false; // Rör sig inte i rätt riktning
-        if(this.col !== newPos.col) { // diagonal
-            return false; 
-        }
-        return true; 
+            console.log(this.row - newPos.row);
+            if((this.row - newPos.row === direction) || (this.row - newPos.row === direction*2)) {
+                console.log("2");
+            if(this.col !== newPos.col) { // diagonal
+                return false; 
+            }
+            return true; 
+        } return false;
     }
     canAttack(board, newPos) {
         const directionRow = this.color === "w" ? 1 : -1;
-        const distance = Math.abs(this.row - newPos.row);
-        if(Math.abs(this.row - newPos.row) === 1 && distance === 1) {
+        const directionCol = Math.abs(this.col - newPos.col);
+        if(this.row - newPos.row === directionRow && directionCol === 1) {
             return true; 
         }
         return false; 
@@ -171,6 +178,16 @@ export class King extends Piece {
         const rowDiff = Math.abs(this.row - newPos.row);
         const colDiff = Math.abs(this.col - newPos.col);
         if(rowDiff <= 1 && colDiff <= 1) {
+            for(let i = 0; i < 8; i++) {
+                for(let j = 0; j < 8; j++) {
+                    if(board[i][j] !== null && board[i][j].color !== this.color) {
+                        if(board[i][j].canAttack(board, newPos)) {
+                            // alert("You cannot move your king there!");
+                            return  false
+                        };
+                    }
+                }
+            }
             return true; 
         }
         return false; 
