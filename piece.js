@@ -20,14 +20,9 @@ export class Pawn extends Piece {
         const direction = this.color === "w" ? 1 : -1;
         const startRow = this.color === "w" ? 6 : 1;
         const distance = Math.abs(this.row - newPos.row);
-        console.log(direction);
-        console.log(distance);
-        console.log(startRow);
         if(this.row - newPos.row )
         if(this.row !== startRow && distance === 2) return false; // Max 2 steg
-            console.log(this.row - newPos.row);
             if((this.row - newPos.row === direction) || (this.row - newPos.row === direction*2)) {
-                console.log("2");
             if(this.col !== newPos.col) { // diagonal
                 return false; 
             }

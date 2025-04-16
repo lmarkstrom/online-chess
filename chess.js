@@ -5,18 +5,27 @@ import { Pawn, Rook, Knight, Bishop, Queen, King } from "./piece.js";
 
 const boardHolder = document.getElementById("board");
 
+class enPassant {
+    constructor() {
+        this.color = null;
+        this.pos = null;
+        this.move = null;
+    }
+}
+
 export class Chess {
     constructor() {
-        this.player_1 = new Player("Player 1");
-        this.player_2 = null;
+        this.player_1 = new Player("Player 1", "w");
+        this.player_2 = new Player("Player 2", "b");
         this.board = [];
-        this.currentPlayer = "w"; // player 0 = white, player 1 = black
+        this.currentPlayer = "w";
         this.currentPiece = null;
         this.winner = null;
         this.gameOver = false;
         this.moveHistory = [];
         this.board = [];
         this.check = false;
+        this.enPassant = new enPassant();
 
         this.placePieces();
         this.drawBoard();
@@ -131,9 +140,12 @@ export class Chess {
                         this.attack(this.board[row][col]);
                     }
                 }
-            } else {
+            } else if (this.enPassantAttack(row, col)) {
+                this.attackEnPassant(row, col);
+            }else {
+                console.log("else")
                 console.log(this.currentPiece.canMove(this.board, {row: row, col: col}));
-                if(this.currentPiece.canMove(this.board, {row: row, col: col})) {
+                if(this.currentPiece.canMove(this.board, {row: row, col: col}) ) {
                     this.move(row, col);
                 }else alert("Invalid move!");
             }
@@ -162,7 +174,6 @@ export class Chess {
         }
     }
     checkCheckmate(col) {
-        // const col = this.currentPlayer === "w" ? "b" : "w";
         for(let i = 0; i < 8; i++) {
             for(let j = 0; j < 8; j++) {
                 if(this.board[i][j] !== null && this.board[i][j].color === col && this.board[i][j].name === "king") {
@@ -193,6 +204,7 @@ export class Chess {
             this.board[row][col] = tmp2;
             return;
         }
+        this.checkEnPassant(row, col);
         this.currentPiece.row = row;
         this.currentPiece.col = col;
         this.setSquareInactive();
@@ -200,6 +212,7 @@ export class Chess {
         this.addPosToHistory(row, col);
         this.checkGameOver();
         this.userMove();
+        this.updatePlayerMoves();
     }
 
     attack(target) {
@@ -221,5 +234,55 @@ export class Chess {
         this.addPosToHistory(target.row, target.col);
         this.checkGameOver();
         this.userMove();
+    }
+
+    updatePlayerMoves() {
+        
+    }
+
+    attackEnPassant(row, col) {
+        let dir = this.currentPiece.color === "w" ? -1 : 1;
+        let tmp1 = this.currentPiece;
+        let tmp2 = this.board[row][col];
+        this.board[row][col] = this.currentPiece;
+        this.board[this.currentPiece.row][this.currentPiece.col] = null;
+        this.board[this.enPassant.pos.row - dir][this.enPassant.pos.col] = null;
+        if(this.checkCheckmate(this.currentPlayer) === "check"){
+            alert("Invalid move!");
+            this.currentPiece = tmp1;
+            this.board[target.row][target.col] = tmp2;
+            return;
+        }
+        this.currentPiece.row = row;
+        this.currentPiece.col = col;
+        this.setSquareInactive();
+        this.drawBoard();
+        this.addPosToHistory(row, col);
+        this.checkGameOver();
+        this.userMove();
+    }
+
+    checkEnPassant(row, col) {
+        if(this.currentPiece.name === "pawn" && Math.abs(this.currentPiece.row - row) === 2) {
+            let dir = this.currentPiece.color === "w" ? -1 : 1;
+            this.enPassant.color = this.currentPiece.color;
+            this.enPassant.pos = {row: row - dir, col: col};
+            console.log(this.enPassant.pos);
+            this.enPassant.move = this.moveHistory.length;
+        }
+    }
+    
+    enPassantAttack(row, col) {
+        if(this.currentPiece.name === "pawn" && this.enPassant.color !== null && this.enPassant.move === this.moveHistory.length - 1) {
+            if(this.enPassant.pos.row === row && this.enPassant.pos.col === col && this.enPassant.color !== this.currentPiece.color) {
+                return true;
+            }else return false
+        }else return false;
+    }
+    castling() {
+        // TODO
+    }
+    promotion() {
+        // TODO
     }
 }
