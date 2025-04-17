@@ -104,7 +104,6 @@ export class Chess {
         const to = files[col] + (8 - row);
         const move = `${from} → ${to}`;
         this.moveHistory.push(move);
-        console.log(move);
         this.drawHistory();
     }
 
@@ -119,9 +118,6 @@ export class Chess {
     }
 
     handleUserClick(row, col) {
-        console.log(this.currentPiece);
-        console.log(this.currentPlayer);
-
         if (this.gameOver) return;
         if(this.currentPiece === null || (this.board[row][col] !== null && this.board[row][col].color === this.currentPlayer)) {
             if(this.board[row][col] !== null){
@@ -129,27 +125,23 @@ export class Chess {
                     alert("You can only move your own pieces!");
                     return;
                 }else if(this.checkCastling(row, col)) {
-                    console.log("castling");
                     this.setSquareInactive(row, col, this.board[row][col]);
                     return;
                 }
             }else return;
             this.setSquareActive(row, col, this.board[row][col]);
         } else {
-            console.log(this.board[row][col])
             if(this.board[row][col] !== null) {
                 if(this.board[row][col].color !== this.currentPlayer) {
                     if(this.currentPiece.canAttack(this.board, {row: row, col: col})) {
                         this.attack(this.board[row][col]);
                     }
                 }else {
-                    console.log("else")
                     this.checkCastling(row, col);
                 }
             } else if (this.enPassantAttack(row, col)) {
                 this.attackEnPassant(row, col);
             }else {
-                console.log(this.currentPiece.canMove(this.board, {row: row, col: col}));
                 if(this.currentPiece.canMove(this.board, {row: row, col: col}) ) {
                     this.move(row, col);
                 }else alert("Invalid move!");
@@ -158,7 +150,7 @@ export class Chess {
     }
     
     userMove() {
-        // this.currentPlayer = this.currentPlayer === "w" ? "b" : "w";
+        this.currentPlayer = this.currentPlayer === "w" ? "b" : "w";
     }
 
     updateCastleMove(piece){
@@ -169,7 +161,6 @@ export class Chess {
 
     checkGameOver() {
         let color = this.currentPlayer === "w" ? "b" : "w";
-        console.log(this.checkCheckmate(color) + "__");
         if(this.checkCheckmate(color) === "checkmate") {
             this.gameOver = true;
             this.winner = this.currentPlayer === "w" ? "Black" : "White";
@@ -254,7 +245,6 @@ export class Chess {
         let tmp2 = this.board[row][col];
         this.board[row][col] = this.currentPiece;
         this.board[this.currentPiece.row][this.currentPiece.col] = null;
-        console.log(this.checkCheckmate(this.currentPlayer));
         if(this.checkCheckmate(this.currentPlayer) === "check"){
             alert("Invalid move!");
             this.currentPiece = tmp1;
@@ -270,8 +260,8 @@ export class Chess {
         this.addPosToHistory(row, col);
         this.checkGameOver();
         this.userMove();
-        this.updatePlayerMoves();
         this.updateCastleMove(oldPiece);
+        this.promotion(row, col, oldPiece);
     }
 
     attack(target) {
@@ -279,7 +269,6 @@ export class Chess {
         let tmp2 = this.board[target.row][target.col];
         this.board[target.row][target.col] = this.currentPiece;
         this.board[this.currentPiece.row][this.currentPiece.col] = null;
-        console.log(this.checkCheckmate(this.currentPlayer));
         if(this.checkCheckmate(this.currentPlayer) === "check"){
             alert("Invalid move!");
             this.currentPiece = tmp1;
@@ -288,15 +277,13 @@ export class Chess {
         }
         this.currentPiece.row = target.row;
         this.currentPiece.col = target.col;
+        let oldPiece = this.currentPiece;
         this.setSquareInactive();
         this.drawBoard();
         this.addPosToHistory(target.row, target.col);
         this.checkGameOver();
         this.userMove();
-    }
-
-    updatePlayerMoves() {
-        
+        this.promotion(target.row, target.col, oldPiece);
     }
 
     attackEnPassant(row, col) {
@@ -326,7 +313,6 @@ export class Chess {
             let dir = this.currentPiece.color === "w" ? -1 : 1;
             this.enPassant.color = this.currentPiece.color;
             this.enPassant.pos = {row: row - dir, col: col};
-            console.log(this.enPassant.pos);
             this.enPassant.move = this.moveHistory.length;
         }
     }
@@ -339,37 +325,38 @@ export class Chess {
         }else return false;
     }
     checkCastling(row, col) {
-        console.log(col)
         if(this.currentPiece === null) return false;
         let dir = col - this.currentPiece.col;
         dir = dir > 0 ? 1 : -1;
         if(this.currentPiece.name === "king" && this.currentPiece.moved === false) {
-            console.log("king move")
             if(this.board[row][col].name === "rook" && this.board[row][col].moved === false) {
-                console.log("12 move")
                 if(this.board[this.currentPiece.row][this.currentPiece.col + dir*2] === null && this.board[this.currentPiece.row][this.currentPiece.col + dir] === null) {
-                    console.log(row + " " + col + " " + dir);
-                    console.log(this.currentPiece.col + dir*2)
                     let rookDist = Math.abs(this.currentPiece.col - col) - 1;
                     this.move(row, this.currentPiece.col + dir*2);
-                    console.log("move")
                     this.currentPiece = this.board[row][col];
                     this.move(row, col - dir*rookDist);
-                    console.log("move2")
                     return true;
                 }else {
-                    console.log("23232")
                     alert("Invalid move!")
                 };
             }
         }else if(this.currentPiece.name === "rook" && this.currentPiece.moved === false){
             console.log("rook move")
         }else {
-            console.log("else")
             return false;
         }
     }
-    promotion() {
-        // TODO
+    promotion(row, col, piece) {
+        console.log("Promotion check")
+        let finalRow = piece.color === "w" ? 0 : 7;
+        console.log("Final Row: ", finalRow)
+        console.log("Row: ", row)
+        console.log("Col: ", col)
+        console.log("Piece: ", piece)
+        if(piece.name === "pawn" && row === finalRow) {
+            console.log("Promotion")
+            this.board[row][col] = new Queen(piece.color, {row: row, col: col});
+            this.drawBoard();
+        }else console.log("Not a promotion")
     }
 }

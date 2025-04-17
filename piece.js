@@ -77,16 +77,13 @@ export class Rook extends Piece {
         if(this.row === newPos.row || this.col === newPos.col) {
             const directionRow = Math.sign(newPos.row - this.row);
             const directionCol = Math.sign(newPos.col - this.col);
-            console.log(directionRow, directionCol);
             if(Math.abs(this.row - newPos.row) === 1 || Math.abs(this.col - newPos.col) === 1) {
                 return true;
             }
             if(directionRow !== 0) {
-                console.log("row", newPos.row + directionRow);
                 if(this.canMove(board, {row: newPos.row - directionRow, col: newPos.col})) return true;
                 else return false;
             }else if(directionCol !== 0) {
-                console.log("col", newPos.col - directionCol);
                 if(this.canMove(board, {row: newPos.row, col: newPos.col - directionCol})) return true;
                 else return false;
             }
