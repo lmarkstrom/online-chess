@@ -42,6 +42,7 @@ export class Pawn extends Piece {
 export class Rook extends Piece {
     constructor(color, pos) {
         super("rook", color, pos);
+        this.moved = false; // For castling
     }
     canMove(board, newPos) {
         if(this.row === newPos.row) {
@@ -168,6 +169,7 @@ export class Queen extends Piece {
 export class King extends Piece {
     constructor(color, pos) {
         super("king", color, pos);
+        this.moved = false; // For castling
     }
     canMove(board, newPos) {
         const rowDiff = Math.abs(this.row - newPos.row);
