@@ -1,0 +1,18 @@
+{
+  "env": {
+    "es2022": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "eslint-config-airbnb-base",
+    "eslint-config-prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+    "import/extensions": "off",
+    "no-console": "off"
+  }
+}
