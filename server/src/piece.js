@@ -8,7 +8,7 @@ class Piece {
         this.img = this.getImage();
     }
     getImage() {
-        return `/public/pieces/${this.name}-${this.color}.svg`;
+        return `/pieces/${this.name}-${this.color}.svg`;
     }
 }
 

@@ -1,37 +1,31 @@
 <template>
     <section class="container-fluid py-4">
-        <div>
-            <h1>Vue Chess</h1>
-            <div class="board">
-            <div
-                v-for="(row, rowIndex) in board"
-                :key="rowIndex"
-                class="row"
-            >
-                <div
-                v-for="(square, colIndex) in row"
-                :key="colIndex"
-                class="square"
-                :style="getSquareStyle(rowIndex, colIndex)"
-                @click="handleClick(rowIndex, colIndex)"
-                >
-                <img
-                    v-if="square"
-                    :src="square.img"
-                    :alt="square.name"
-                    class="piece"
-                />
+        <div id="app">
+            <div id="game">
+                <div id="board">
+                    <div
+                        v-for="(square, index) in board.flat()"
+                        :key="index"
+                        class="square"
+                        :style="getSquareStyle(Math.floor(index / 8), index % 8)"
+                        @click="handleClick(Math.floor(index / 8), index % 8)"
+                    >
+                        <img
+                        v-if="square"
+                        :src="square.img"
+                        :alt="square.name"
+                        class="piece"
+                        />
+                    </div>
                 </div>
             </div>
-            </div>
-
-            <div>
-            <h2>Move History</h2>
-            <ul>
+            <div id="history">
+                <h2>History</h2>
+                <ul id="history-list">
                 <li v-for="(move, index) in moveHistory" :key="index">
-                {{ index + 1 }}. {{ move }}
+                    {{ index + 1 }}. {{ move }}
                 </li>
-            </ul>
+                </ul>
             </div>
         </div>
     </section>
@@ -47,6 +41,7 @@
     }),
     mounted() {
         this.fetchGame();
+        // this.drawBoard();
     },
     methods: {
         async fetchGame() {
@@ -76,21 +71,101 @@
   };
 </script>
 
-<!-- <style scoped>
-.board {
-  display: grid;
-  grid-template-columns: repeat(8, 60px);
-  grid-template-rows: repeat(8, 60px);
+<style scoped>
+HTML, body {
+    margin: 0;
+    padding: 0;
 }
+
+/* Main container */
+#app {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 100vh;
+    background-color: #282c34;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Game board  */
+#game {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    width: 70%;
+    max-height: 800px;
+    max-width: 800px;
+    aspect-ratio: 1 / 1;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: 100%;
+    height: 100%;
+    border: 5px solid #222;
+}
+
+.square:nth-child(even) {
+    background-color: #b58863;
+}
+
+/* squares */
 .square {
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    width: 100%;
+    height: 100%;
 }
-.piece {
-  max-width: 100%;
-  max-height: 100%;
+
+.square:nth-child(odd) {
+    background-color: #f0d9b5;
 }
-</style> -->
+.square:hover {
+    background-color: rgba(0, 255, 0, 0.5);
+    cursor: pointer;
+}
+
+/* Pieces */
+.square img.piece {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+/* History */
+#history {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 200px;
+    height: 500px;
+    overflow-y: auto;
+}
+
+#history h2 {
+    text-align: center;
+}
+
+#history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#history-list li {
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+}
+</style>
