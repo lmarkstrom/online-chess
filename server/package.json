@@ -16,7 +16,7 @@
     "run-script-os": "^1.1.6"
   },
   "license": "ISC",
-  "name": "lab4",
+  "name": "online-chess",
   "private": true,
   "scripts": {
     "lint": "run-script-os",
@@ -25,7 +25,8 @@
     "lint:fix:darwin:linux": "eslint --fix 'src/**/*.js' ; prettier --write src/",
     "lint:fix:win32": "eslint --fix src/**/*.js & prettier --write src/",
     "lint:win32": "eslint src/**/*.js & prettier --check src/",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "format": "prettier --write ."
   },
   "type": "module",
   "version": "1.0.0"

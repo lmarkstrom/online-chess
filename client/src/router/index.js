@@ -3,6 +3,7 @@ import store from "../store";
 import Login from "../views/Login.vue";
 import Home from "../views/Home.vue";
 import Register from "../views/Register.vue";
+import Game from "../views/Game.vue";
 
 const routes = [
   {
@@ -20,6 +21,10 @@ const routes = [
   {
     path: "/home",
     component: Home,
+  },
+  {
+    path: "/game",
+    component: Game,
   }
 ];
 
@@ -30,12 +35,13 @@ const router = createRouter({
 
 // Setup authentication guard.
 router.beforeEach((to, from, next) => {
-  if (store.state.authenticated && to.path !== "/login" && from.path !== "/register") {
-    next();
-  } else {
-    console.info("Unauthenticated user. Redirecting to login page.");
-    next("/login");
-  }
+  next();
+  // if (store.state.authenticated && to.path !== "/login" && from.path !== "/register") {
+  //   next();
+  // } else {
+  //   console.info("Unauthenticated user. Redirecting to login page.");
+  //   next("/login");
+  // }
 });
 
 export default router;

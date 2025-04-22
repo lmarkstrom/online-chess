@@ -57,11 +57,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Controllers
 app.use(userController.publicRouter);
-app.use("/home", requireAuth, userController.privateRouter);
-
-// Bind REST controllers to /api/*
-// app.use("/api", auth.router);
-// app.use("/api", auth.requireAuth, chat.router);
+// app.use("/home", requireAuth, userController.privateRouter);
 
 // Initialize a model
 model.init(io);

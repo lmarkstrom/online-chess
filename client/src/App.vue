@@ -19,6 +19,9 @@
         <li v-if="isAuthenticated" class="nav-item">
           <a class="nav-link" href="#" @click="logout()">Logout</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" @click="redirect('/game')">Game</a>
+        </li>
       </ul>
     </div>
   </nav>
