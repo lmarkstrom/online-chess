@@ -7,12 +7,16 @@ import { Server } from "socket.io";
 import { resolvePath } from "./util.js";
 import model from "./model.js";
 import userController from "./controllers/user.controller.js";
+import gameController from "./controllers/game.controller.js";
 import { requireAuth } from "./middleware/requireAuth.js";
+import { Chess } from "./chess.js";
 
 const port = 8989;
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
+
+export const game = new Chess();
 
 const { Theme } = betterLogging;
 betterLogging(console, {
@@ -57,6 +61,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Controllers
 app.use(userController.publicRouter);
+app.use(gameController.publicRouter);
 // app.use("/home", requireAuth, userController.privateRouter);
 
 // Initialize a model
