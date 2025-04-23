@@ -1,0 +1,34 @@
+{
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "eslint-config-airbnb-base",
+    "plugin:vue/vue3-recommended",
+    "@vue/eslint-config-airbnb",
+    "eslint-config-prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+    "no-console": "off",
+    "no-param-reassign": [
+      "error",
+      {
+        "ignorePropertyModificationsFor": [
+          "state"
+        ],
+        "props": true
+      }
+    ],
+    "vue/no-static-inline-styles": [
+      "error",
+      {
+        "allowBinding": false
+      }
+    ]
+  }
+}
