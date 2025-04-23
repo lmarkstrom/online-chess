@@ -1,7 +1,7 @@
-class Assistant { 
-    constructor(name, id){
+class User { 
+    constructor(id, username){
       this.id = id;
-      this.username= name;
+      this.username= username;
     }
  }
- export default Assistant;
+ export default User;
