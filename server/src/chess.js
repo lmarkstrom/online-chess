@@ -81,22 +81,22 @@ export class Chess {
 
     setSquareActive(row, col, piece) {
         this.currentPiece = piece;
-        document.querySelectorAll(".square").forEach(square => {
-            const r = parseInt(square.dataset.row);
-            const c = parseInt(square.dataset.col);
-            square.style.backgroundColor = (r + c) % 2 === 0 ? "#eee" : "#444";
-        });
-        const index = row * 8 + col;
-            const square = document.querySelectorAll(".square")[index];
-            square.style.backgroundColor = "green";
+        // document.querySelectorAll(".square").forEach(square => {
+        //     const r = parseInt(square.dataset.row);
+        //     const c = parseInt(square.dataset.col);
+        //     square.style.backgroundColor = (r + c) % 2 === 0 ? "#eee" : "#444";
+        // });
+        // const index = row * 8 + col;
+        //     const square = document.querySelectorAll(".square")[index];
+        //     square.style.backgroundColor = "green";
     }
     setSquareInactive() {
         this.currentPiece = null;
-        document.querySelectorAll(".square").forEach(square => {
-            const r = parseInt(square.dataset.row);
-            const c = parseInt(square.dataset.col);
-            square.style.backgroundColor = (r + c) % 2 === 0 ? "#eee" : "#444";
-        });
+        // document.querySelectorAll(".square").forEach(square => {
+        //     const r = parseInt(square.dataset.row);
+        //     const c = parseInt(square.dataset.col);
+        //     square.style.backgroundColor = (r + c) % 2 === 0 ? "#eee" : "#444";
+        // });
     }
 
     addPosToHistory(row, col) {
@@ -109,13 +109,13 @@ export class Chess {
     }
 
     drawHistory() {
-        const historyEl = document.getElementById("history-list");
-        historyEl.innerHTML = "";
-        this.moveHistory.forEach((move, index) => {
-            const li = document.createElement("li");
-            li.textContent = `${index + 1}. ${move}`;
-            historyEl.appendChild(li);
-        });
+        // const historyEl = document.getElementById("history-list");
+        // historyEl.innerHTML = "";
+        // this.moveHistory.forEach((move, index) => {
+        //     const li = document.createElement("li");
+        //     li.textContent = `${index + 1}. ${move}`;
+        //     historyEl.appendChild(li);
+        // });
     }
 
     handleUserClick(row, col) {
@@ -123,7 +123,7 @@ export class Chess {
         if(this.currentPiece === null || (this.board[row][col] !== null && this.board[row][col].color === this.currentPlayer)) {
             if(this.board[row][col] !== null){
                 if(this.board[row][col].color !== this.currentPlayer) {
-                    alert("You can only move your own pieces!");
+                    // alert("You can only move your own pieces!");
                     return;
                 }else if(this.checkCastling(row, col)) {
                     this.setSquareInactive(row, col, this.board[row][col]);
@@ -145,7 +145,9 @@ export class Chess {
             }else {
                 if(this.currentPiece.canMove(this.board, {row: row, col: col}) ) {
                     this.move(row, col);
-                }else alert("Invalid move!");
+                }else {
+                    // alert("Invalid move!");
+                }
             }
         }
     }
@@ -165,15 +167,15 @@ export class Chess {
         if(this.checkCheckmate(color) === "checkmate") {
             this.gameOver = true;
             this.winner = this.currentPlayer === "w" ? "Black" : "White";
-            alert(`${this.winner} wins!`);
+            // alert(`${this.winner} wins!`);
         }else if(this.checkCheckmate(color) === "draw") {
             this.gameOver = true;
-            alert("Draw!");
+            // alert("Draw!");
         } else if(this.checkCheckmate(color) === "noCheckamte") {
             this.gameOver = false;
         } else if(this.checkCheckmate(color) === "check") {
             this.check = true;
-            alert("Check!");
+            // alert("Check!");
         }
     }
     isKingInCheck(color, king) {
@@ -247,7 +249,7 @@ export class Chess {
         this.board[row][col] = this.currentPiece;
         this.board[this.currentPiece.row][this.currentPiece.col] = null;
         if(this.checkCheckmate(this.currentPlayer) === "check"){
-            alert("Invalid move!");
+            // alert("Invalid move!");
             this.currentPiece = tmp1;
             this.board[row][col] = tmp2;
             return;
@@ -271,7 +273,7 @@ export class Chess {
         this.board[target.row][target.col] = this.currentPiece;
         this.board[this.currentPiece.row][this.currentPiece.col] = null;
         if(this.checkCheckmate(this.currentPlayer) === "check"){
-            alert("Invalid move!");
+            // alert("Invalid move!");
             this.currentPiece = tmp1;
             this.board[target.row][target.col] = tmp2;
             return;
@@ -295,7 +297,7 @@ export class Chess {
         this.board[this.currentPiece.row][this.currentPiece.col] = null;
         this.board[this.enPassant.pos.row - dir][this.enPassant.pos.col] = null;
         if(this.checkCheckmate(this.currentPlayer) === "check"){
-            alert("Invalid move!");
+            // alert("Invalid move!");
             this.currentPiece = tmp1;
             this.board[target.row][target.col] = tmp2;
             return;
@@ -338,7 +340,7 @@ export class Chess {
                     this.move(row, col - dir*rookDist);
                     return true;
                 }else {
-                    alert("Invalid move!")
+                    // alert("Invalid move!")
                 };
             }
         }else if(this.currentPiece.name === "rook" && this.currentPiece.moved === false){
