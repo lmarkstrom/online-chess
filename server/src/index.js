@@ -62,7 +62,8 @@ app.use(express.urlencoded({ extended: true }));
 // Controllers
 app.use(userController.publicRouter);
 app.use(gameController.publicRouter);
-// app.use("/home", requireAuth, userController.privateRouter);
+app.use("/home", requireAuth, userController.privateRouter);
+app.use("/home", requireAuth, gameController.privateRouter);
 
 // Initialize a model
 model.init(io);

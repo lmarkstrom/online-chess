@@ -16,7 +16,7 @@ class Model {
       this.users[row.id] = new User(row.id, row.username);
     });
     await db.each("SELECT * FROM games WHERE finished = 0", (err, row) => {
-      this.games[row.id] = new Game(row.id, row.user_1, row.user_2, row.game_board, row.game_history, row.turn);
+      this.games[row.id] = new Game(row.id, row.game_name, row.host, row.user_1, row.user_2, row.game_board, row.game_history, row.turn);
     });
     console.log(this.users);
     console.log(this.games);
@@ -50,7 +50,15 @@ class Model {
       }
     }
   }
-
+  getGamesForUser(user_id) {
+    const games = [];
+    for (const id in this.games) {
+      if (this.games[id].user_1 === user_id || this.games[id].user_2 === user_id || this.games[id].user_2 === null) {
+        games.push(this.games[id]);
+      }
+    }
+    return games;
+  }
   findSessionById(id){
     return this.sessions[id];
   }
@@ -59,14 +67,17 @@ class Model {
     this.games[id] = new Game(id, user_1, user_2, game_board, game_history, turn);
   }
 
-  newGame(id, user_1, user_2, game_board, game_history, turn) {
-    this.games[id] = new Game(id, user_1, user_2, game_board, game_history, turn);
+  newGame(id, game_name, host, user_1, user_2, game_board, game_history, turn) {
+    this.games[id] = new Game(id, game_name, host, user_1, user_2, game_board, game_history, turn);
   }
 
   removeGame(id) {
     games.forEach(game => {
       delete this.games[game.id];
     });
+  }
+  broadcastNewGame(game) {
+    this.io.emit("newGame", game);
   }
 
   broadcastOn(id) {
