@@ -1,6 +1,8 @@
 class Game { 
-    constructor(id, user_1, user_2, board_text, history_text, turn) {
+    constructor(id, game_name, host, user_1, user_2, board_text, history_text, turn) {
       this.id = id;
+      this.game_name = game_name;
+      this.host = host;
       this.user_1 = user_1;
       this.user_2 = user_2;
       this.board = this.createBoard(board_text);
