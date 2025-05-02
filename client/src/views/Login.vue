@@ -15,7 +15,7 @@
         <input
           id="password"
           v-model="password"
-          type="text"
+          type="password"
           class="form-control"
           placeholder="type 1234"
           required
