@@ -9,10 +9,16 @@
 <script>
 export default {
     name: "Home",
-    data() {
-        return {
-            username: "Guest", // Replace with dynamic username if needed
-        };
+    components: {},
+    data: () => ({
+        username: "",
+        user_id: null,
+    }),
+    mounted() {
+        const { getters } = this.$store;
+        this.username = getters.getUsername;
+        this.user_id = getters.getUserId;
+        console.log("User ID:", this.user_id);
     },
 };
 </script>

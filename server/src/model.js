@@ -1,72 +1,72 @@
-import Users from "./models/user.model.js";
+import User from "./models/user.model.js";
+import Game from "./models/game.model.js";
 import db from "./db.js";
 
 class Model {
   constructor() {
-    this.timeslots = {};
-    this.assistants = {};
-    this.session = {};
+    this.games = {};
+    this.users = {};
+    this.sessions = {};
     this.io = undefined;
   }
 
   async init(io) {
     this.io = io;
-    // await db.each("SELECT * FROM assistants", (err, row) => {
-    //   this.assistants[row.name] = new Users(row.name, row.id);
-    // });
-    // await db.each("SELECT * FROM timeslots", (err, row) => {
-    //   this.timeslots[row.id] = new Timeslot(row.assistant_id, row.assistant_name, row.id, row.time, row.booked, row.booked_by);
-    // });
-    console.log(this.assistants);
-    console.log(this.timeslots);
+    await db.each("SELECT * FROM users", (err, row) => {
+      this.users[row.id] = new User(row.id, row.username);
+    });
+    await db.each("SELECT * FROM games WHERE finished = 0", (err, row) => {
+      this.games[row.id] = new Game(row.id, row.user_1, row.user_2, row.game_board, row.game_history, row.turn);
+    });
+    console.log(this.users);
+    console.log(this.games);
   }
 
-  findAssistantByName(name) {
-    return this.assistants[name];
+  findGameById(id) {
+    return this.games[id];
   }
-
-  createSession(username, id) {
-    this.session[id] = {username: username, time: new Date()};
-    console.log("Created session " + this.session);
+  findUserById(id) {
+    return this.users[id];
+  }
+  findUserByName(username) {
+    for (const id in this.users) {
+      if (this.users[id].username === username) {
+        return this.users[id];
+      }
+    }
+  }
+  createSession(user_id, id) {
+    this.sessions[id] = {user_id, time: new Date()};
+    console.log("Created session " + this.sessions[id]);
     return id;
   }
 
-  removeSession(username) {
-    for (const id in this.session) {
-      if (this.session[id].username === username) {
-        delete this.session[id];
-        console.log(this.session);
+  removeSession(user_id) {
+    for (const id in this.sessions) {
+      if (this.sessions[id].user_id === user_id) {
+        delete this.sessions[id];
+        console.log(this.sessions);
         return;
       }
     }
   }
 
-  findSession(id){
-    return this.session[id];
+  findSessionById(id){
+    return this.sessions[id];
   }
 
-  getTimeslots() {
-    console.log(this.timeslots);
-    return Object.values(this.timeslots);
+  createGame(id, user_1, user_2, game_board, game_history, turn) {
+    this.games[id] = new Game(id, user_1, user_2, game_board, game_history, turn);
   }
 
-  createTimeslot(ass_id, ass_name, id, time) {
-    this.timeslots[id] = new Timeslot(ass_id, ass_name, id, time, false, null);
+  newGame(id, user_1, user_2, game_board, game_history, turn) {
+    this.games[id] = new Game(id, user_1, user_2, game_board, game_history, turn);
   }
 
-  bookTimeslot(id, student) {
-    this.timeslots[id].booked = true;
-    this.timeslots[id].booked_by = student;
-  }
-
-  removeTimeslot(times) {
-    times.forEach(time => {
-      delete this.timeslots[time.id];
+  removeGame(id) {
+    games.forEach(game => {
+      delete this.games[game.id];
     });
-  }
-
-  findAssistantById(id) {
-    return this.assistants[id];
   }
 
   broadcastOn(id) {

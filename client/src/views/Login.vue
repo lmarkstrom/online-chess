@@ -41,7 +41,7 @@ export default {
     async authenticate() {
       console.log(this.username, this.password);
       const regex = /^(?=.*[A-Za-z])(?=.*\d).{3,}$/;
-      if (!(regex.test(this.password) && regex.test(this.username))) {
+      if (!(regex.test(this.password) )) { // && regex.test(this.username)
         this.msg = "Bad credentials!";
         return;
       }
@@ -54,7 +54,7 @@ export default {
         },
         body: JSON.stringify({ username: this.username, password: this.password }),
       }).then((res) => res.json()).then((data) => {
-        if (data !== 0) {
+        if (data !== -1) {
           commit("setAuthenticated", true);
           commit("setUsername", this.username);
           commit("setUserId", data);
@@ -62,7 +62,7 @@ export default {
           this.msg = "Bad credentials!";
         }
       });
-      push(getters.isAuthenticated === true ? "/admin" : "/login");
+      push(getters.isAuthenticated === true ? "/home" : "/login");
     },
   },
 };
