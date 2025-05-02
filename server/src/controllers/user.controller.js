@@ -1,6 +1,8 @@
 import { Router } from "express";
 import model from "../model.js";
 import db from "../db.js";
+import pkg from "bcrypt";
+const bcrypt = pkg;
 
 const publicRouter = Router();
 const privateRouter = Router();
@@ -23,28 +25,66 @@ publicRouter.post("/login", async (req, res) => {
     let rowRes = null;
     console.log("User found" + user);
     console.log(username + password);
-    await db.each(
-        "SELECT * FROM users WHERE username = ? AND password = ?",
-        [username, password],
-        (err, row) => {
-          if (row) {
-            rowRes = 1;
+    // await db.each(
+    //     "SELECT * FROM users WHERE username = ? AND password = ?",
+    //     [username, password],
+    //     (err, row) => {
+    //       if (row) {
+    //         rowRes = 1;
+    //       }
+    //     }
+    // );
+    // if (rowRes === null) {
+    //   console.log("User not found");
+    //   return res.status(401).send(String(0));
+    // }
+
+    db.each("SELECT * FROM users WHERE username = ?", [username], async (err, row) => {
+      if(row === undefined){
+        console.log("User not found");
+        return res.status(401).send(String(0));
+      }else {
+        bcrypt.compare(password, row.password, async (err, result) => {
+          if(!result){
+            console.log("Password is incorrect");
+            return res.status(401).send(String(0));
+          }else {
+            model.createSession(username, id);
+            console.log("Session created" + model.sessions);
+            return res.cookie("session-id", id).send(String(1));
           }
-        }
-    );
-    if (rowRes === null) {
-      console.log("User not found");
-      return res.status(401).send(String(0));
-    }
-    model.createSession(username, id);
-    console.log("Session created" + model.sessions);
-    return res.cookie("session-id", id).send(String(result));
+        });
+      }
+    });  
 });
 
 privateRouter.post("/logout", (req, res) => {
     const { username } = req.body;
     model.removeSession(username);
     res.clearCookie("session-id").send("ok");
+});
+
+publicRouter.post("/register", async (req, res) => {
+    const { username, password } = req.body;
+    
+    const user = model.findUserByName(username);
+    if (user !== undefined) {
+        console.log("User already exists");
+        return res.status(401).send(String(0));
+    }
+    const sessionId = null;
+    const saltRounds = 10;
+    bcrypt.hash(password, saltRounds, async (err, hash) => {
+      const statement = await db.prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+      statement.run(username, hash);
+      statement.finalize();
+      db.each("SELECT last_insert_rowid() AS id", (err, row) => {
+        model.createSession(username, row.id);
+        sessionId = row.id;
+      });
+      return res.cookie("session-id", sessionId).send(String(1));
+      
+    });
 });
 
 export default { publicRouter, privateRouter };
