@@ -13,7 +13,7 @@ class Model {
   async init(io) {
     this.io = io;
     await db.each("SELECT * FROM users", (err, row) => {
-      this.assistants[row.id] = new User(row.id, row.username);
+      this.users[row.id] = new User(row.id, row.username);
     });
     await db.each("SELECT * FROM games WHERE finished = 0", (err, row) => {
       this.games[row.id] = new Game(row.id, row.user_1, row.user_2, row.game_board, row.game_history, row.turn);
@@ -27,6 +27,13 @@ class Model {
   }
   findUserById(id) {
     return this.users[id];
+  }
+  findUserByName(username) {
+    for (const id in this.users) {
+      if (this.users[id].username === username) {
+        return this.users[id];
+      }
+    }
   }
   createSession(user_id, id) {
     this.sessions[id] = {user_id, time: new Date()};

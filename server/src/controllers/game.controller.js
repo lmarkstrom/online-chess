@@ -2,7 +2,7 @@ import { Router } from "express";
 import model from "../model.js";
 import { game } from "../index.js";
 import { Chess } from "../chess.js";
-import { db } from "../db.js";
+import db from "../db.js";
 
 const publicRouter = Router();
 const privateRouter = Router();
