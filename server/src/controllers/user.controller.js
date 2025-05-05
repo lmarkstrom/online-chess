@@ -21,7 +21,7 @@ publicRouter.post("/login", async (req, res) => {
     const user = model.findUserByName(username);
     if (user !== undefined) {
         result = user.id;
-    } else return res.status(401).send(String(0));
+    } else return res.status(401).send(String(-1));
     let rowRes = null;
     console.log("User found" + user);
     console.log(username + password);
@@ -29,12 +29,12 @@ publicRouter.post("/login", async (req, res) => {
     db.each("SELECT * FROM users WHERE username = ?", [username], async (err, row) => {
       if(row === undefined){
         console.log("User not found");
-        return res.status(401).send(String(0));
+        return res.status(401).send(String(-1));
       }else {
         bcrypt.compare(password, row.password, async (err, result) => {
           if(!result){
             console.log("Password is incorrect");
-            return res.status(401).send(String(0));
+            return res.status(401).send(String(-1));
           }else {
             model.createSession(username, id);
             console.log("Session created" + model.sessions);
