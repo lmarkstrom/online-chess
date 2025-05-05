@@ -48,7 +48,7 @@ export default {
     },
     methods: {
         async handleRegister() {
-            const { push } = this.$router;
+            
             
             if(!this.form.username || !this.form.password || !this.form.passwordcheck) {
                 alert("Please fill in all fields.");
@@ -63,6 +63,9 @@ export default {
                 alert("Password does not match regex lol");
                 return;
             }
+
+            const { commit, getters } = this.$store;
+            const { push } = this.$router;
             
             try { 
                 await fetch("/register", {
@@ -72,10 +75,11 @@ export default {
                     },
                     body: JSON.stringify(this.form),
                 }).then((res) => res.json()).then((data) => {
-            
-                    console.log("Registration successful:", data);
+                    console.log("Registration successful:", data); // Now prints the full object
+                    commit("setAuthenticated", true);
+                    commit("setUsername", data.username);
+                    commit("setUserId", data.userId);
                     push("/home");
-                   
                 });
 
                 
