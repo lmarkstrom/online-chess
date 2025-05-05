@@ -71,6 +71,10 @@ class Model {
     this.games[id] = new Game(id, game_name, host, user_1, user_2, game_board, game_history, turn);
   }
 
+  addUser(id, username) {
+    this.users[id] = new User(id, username);
+  }
+
   removeGame(id) {
     games.forEach(game => {
       delete this.games[game.id];

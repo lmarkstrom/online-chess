@@ -3,7 +3,7 @@
         <header>
             <h1 class="display-5">Welcome, {{ username }}!</h1>
         </header>
-        <div class="row">
+        <div class="row" @keydown="emitUpdate()">
             <div class="col-md-6 mb-4">
                 <h1 class="display-5 mb-4">Join games</h1>
                 <div v-if="open_games.length === 0" class="text-muted">No open games yet.</div>
@@ -18,7 +18,7 @@
             </div>
             <div class="col-md-6">
                 <h1 class="display-5 mb-4">Create new Game</h1>
-                <form @submit.prevent="createGame()">
+                <form @submit.prevent="createGame(); emitUpdate()">
                     <input
                         id="gameName"
                         v-model="game_name"
@@ -47,6 +47,7 @@ export default {
         user_id: null,
         open_games: [],
         game_name: "",
+        kickTimer: null,
     }),
     mounted() {
         const { getters } = this.$store;
@@ -69,6 +70,11 @@ export default {
             });
             console.log("New game created:", game);
         });
+        this.emitUpdate();
+        socket.on("sessionTimeout", (msg) => {
+            console.log("sessionTimeout");
+            this.logout();
+        });
     },
     methods: {
         async createGame() {
@@ -82,12 +88,37 @@ export default {
             }).then((res) => res.json()).then((data) => {
                 console.log("Game created:", data);
             });
-            push(getters.isAuthenticated === true ? "/game" : "/login");
         },
         getStatus(game) {
             if (game.user_2 === null) {
                 return "Waiting for player 2...";
             } else return "Game started!";
+        },
+        emitUpdate() {
+            console.log("emitUpdate");
+            socket.emit("updateTime", this.addedTimes);
+        },
+        logout() {
+        const { commit } = this.$store;
+        const { push } = this.$router;
+        fetch("/home/logout", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+            username: this.$store.getters.getUsername,
+            }),
+        })
+            .then((response) => {
+            if (response.ok) {
+                commit("setAuthenticated", false);
+                console.log("Logout successful");
+                push("/login");
+            } else {
+                console.error("Logout failed");
+            }
+        })
         },
     },
     
