@@ -15,8 +15,8 @@ class Model {
     await db.each("SELECT * FROM users", (err, row) => {
       this.users[row.id] = new User(row.id, row.username);
     });
-    await db.each("SELECT * FROM games WHERE finished = 0", (err, row) => {
-      this.games[row.id] = new Game(row.id, row.game_name, row.host, row.user_1, row.user_2, row.game_board, row.game_history, row.turn);
+    await db.each("SELECT * FROM games WHERE winner IS NULL", (err, row) => {
+      this.games[row.id] = new Game(row.id, row.game_name, row.host, row.opponent, row.user_1, row.user_2, row.game_board, row.game_history, row.current_player, row.current_piece, row.winner, row.check_, row.enpassant);
     });
     console.log(this.users);
     console.log(this.games);
@@ -63,18 +63,14 @@ class Model {
     return this.sessions[id];
   }
 
-  createGame(id, user_1, user_2, game_board, game_history, turn) {
-    this.games[id] = new Game(id, user_1, user_2, game_board, game_history, turn);
-  }
-
-  newGame(id, game_name, host, user_1, user_2, game_board, game_history, turn) {
-    this.games[id] = new Game(id, game_name, host, user_1, user_2, game_board, game_history, turn);
+  createGame(id, game_name, host, user_1, user_2, game_board, game_history) {
+    console.log("1");
+    this.games[id] = new Game(id, game_name, host, null, user_1, user_2, game_board, game_history, "w", null, null, null, null);
+    console.log("Game created ok!");
   }
 
   removeGame(id) {
-    games.forEach(game => {
-      delete this.games[game.id];
-    });
+    delete this.games[id];
   }
   broadcastNewGame(game) {
     this.io.emit("newGame", game);

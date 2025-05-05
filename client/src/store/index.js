@@ -5,6 +5,8 @@ export default createStore({
     authenticated: false,
     username: "",
     user_id: "",
+    game_id: null,
+    opponent: null,
     times: [],
     curAssistantTime: {},
   },
@@ -23,7 +25,13 @@ export default createStore({
     },
     getAssistantTime(state) {
       return state.curAssistantTime;
-    }
+    },
+    getOpponent(state) {
+      return state.opponent;
+    },
+    getGameId(state) {
+      return state.game_id;
+    },
   },
   mutations: {
     setAuthenticated(state, authenticated) {
@@ -47,6 +55,9 @@ export default createStore({
     setAssistantTime(state, newAssistantTime){
       state.curAssistantTime = newAssistantTime;
     },
+    setGameId(state, game_id) {
+      state.game_id = game_id;
+    }
     // setBooked(state, time){
     //   state.times[time.id].booked = true;
     //   state.times[time.id].booked_by = time.student;

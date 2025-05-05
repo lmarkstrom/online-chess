@@ -23,7 +23,7 @@ const routes = [
     component: Home,
   },
   {
-    path: "/game",
+    path: "/game/:game_id",
     component: Game,
   }
 ];

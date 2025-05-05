@@ -1,30 +1,30 @@
-class Game { 
-    constructor(id, game_name, host, user_1, user_2, board_text, history_text, turn) {
+import { Chess, EnPassant } from "./chess.js";
+
+class Game extends Chess { 
+    constructor(id, game_name, host, opponent, user_1, user_2, board_text, history_text, current_player, current_piece, winner, check, enpassant_text) {
+      super();
       this.id = id;
       this.game_name = game_name;
       this.host = host;
+      this.opponent = opponent;
       this.user_1 = user_1;
       this.user_2 = user_2;
-      this.board = this.createBoard(board_text);
-      this.moveHistory = this.createHistory(history_text);
-      this.turn = turn;
+      this.board = this.parseString(board_text);
+      this.moveHistory = this.parseString(history_text);
+      this.current_player = current_player;
+      this.current_piece = current_piece;
+      this.winner = winner;
+      this.check = !!check;
+      this.enpassant = enpassant_text ? this.parseJSON(enpassant_text) : new EnPassant();
     }
-
-    createBoard(board_text) {
-        const userObject = JSON.parse(board_text);
-        console.log(userObject);
-        return userObject;
-    }
-    createHistory(history_text) {
-        let arr;
+    parseString(text) {
+      console.log("Parsing string:", text);
         try {
-            arr = JSON.parse(history_text);
-            console.log(arr);
-          } catch (e) {
-            console.error("Failed to parse:", e);
+            return JSON.parse(text);
+        } catch (e) {
+            console.error("Failed to parse JSON:", e);
             return null;
-          }
-        return arr;
+        }
     }
  }
  export default Game;

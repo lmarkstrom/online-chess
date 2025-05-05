@@ -72,17 +72,21 @@ export default {
     },
     methods: {
         async createGame() {
+            const { push } = this.$router;
+            const { commit } = this.$store;
             console.log("Creates new game")
-            await fetch("/home/newGame", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ user_1: this.user_id, username: this.username, game_name: this.game_name }),
-            }).then((res) => res.json()).then((data) => {
-                console.log("Game created:", data);
-            });
-            push(getters.isAuthenticated === true ? "/game" : "/login");
+            const id = await fetch("/home/newGame", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ user_1: this.user_id, username: this.username, game_name: this.game_name }),
+                }).then((res) => res.json()).then((data) => {
+                    console.log("Game created:", data);
+                    return data.game_id;
+                });
+            commit("setGameId", id);
+            push(`/game/${id}`);
         },
         getStatus(game) {
             if (game.user_2 === null) {

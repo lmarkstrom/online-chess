@@ -1,5 +1,9 @@
 <template>
     <section class="container-fluid py-4">
+        <div id="pop-up">
+            Waiting for player 2...<br />
+            <strong>Game ID:</strong> {{ game_id }}<br />
+        </div>
         <div id="app">
             <div id="game">
                 <div id="board">
@@ -36,19 +40,40 @@
     name: "GameView",
     components: {},
     data: () => ({
+        game_id: null,
+        user_id: null,
+        user_1: null,
+        user_2: null,
+        currentPlayer: null,
         board: [],
         moveHistory: [],
     }),
     mounted() {
-        this.fetchGame();
-        // this.drawBoard();
+        const { getters } = this.$store;
+        this.user_id = getters.getUserId;
+        this.user_1 = getters.getUsername;
+        this.game_id = getters.getGameId;
+        if(getters.getOpponent === null){
+            this.fetchGame();
+            // skapa lyssnare på att spelare joinar
+        } {
+            // joina match
+        }
     },
     methods: {
         async fetchGame() {
-            const res = await fetch("/game");
-            const data = await res.json();
-            this.board = data.board;
-            this.moveHistory = data.moveHistory;
+            fetch(`/game/${this.game_id}/fetchGameData`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ game_id: this.game_id}),
+            }). then((res) => res.json()).then((data) => {
+                this.currentPlayer = data.currentPlayer;
+                this.user_2 = data.user_2;
+                this.board = data.board;
+                this.moveHistory = data.moveHistory;
+            });
         },
         async handleClick(row, col) {
             const res = await fetch("/move", {
@@ -56,7 +81,6 @@
                 headers: {
                 "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ row, col }),
             });
 
             const data = await res.json();
@@ -167,5 +191,19 @@ HTML, body {
 #history-list li {
     padding: 5px;
     border-bottom: 1px solid #ccc;
+}
+
+/* pop-up */
+#pop-up{
+    position: flex;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 1);
+    color: white;
+    text-align: center;
+    font-size: 1.5rem;
+    z-index: 1000;
 }
 </style>
