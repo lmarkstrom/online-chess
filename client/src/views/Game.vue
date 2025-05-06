@@ -1,8 +1,10 @@
 <template>
     <section class="container-fluid py-4">
-        <div id="pop-up">
-            Waiting for player 2...<br />
-            <strong>Game ID:</strong> {{ game_id }}<br />
+        <div v-if="user_2 === null" class="overlay">
+            <div class="overlay-content">
+                <p>Waiting for player 2…</p>
+                <p><strong>Game ID:</strong> {{ game_id }}</p>
+            </div>
         </div>
         <div id="app">
             <div id="game">
@@ -103,107 +105,96 @@ HTML, body {
 
 /* Main container */
 #app {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    height: 100vh;
-    background-color: #282c34;
-    justify-content: center;
-    gap: 20px;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
 }
 
-/* Game board  */
+/* board */
 #game {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f0f0f0;
-    width: 70%;
-    max-height: 800px;
-    max-width: 800px;
-    aspect-ratio: 1 / 1;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
 }
-
 #board {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    width: 100%;
-    height: 100%;
-    border: 5px solid #222;
-}
-
-.square:nth-child(even) {
-    background-color: #b58863;
+  display: grid;
+  grid-template: repeat(8, 1fr) / repeat(8, 1fr);
+  width: 500px;
+  height: 500px;
+  border: 4px solid #222;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 /* squares */
 .square {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
-    font-weight: bold;
-    width: 100%;
-    height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.2s;
+}
+.square:nth-child(odd) { background-color: #f0d9b5; }
+.square:nth-child(even){ background-color: #b58863; }
+.square.hoverable:hover {
+  background-color: rgba(0, 255, 0, 0.4);
+  cursor: pointer;
 }
 
-.square:nth-child(odd) {
-    background-color: #f0d9b5;
-}
-.square:hover {
-    background-color: rgba(0, 255, 0, 0.5);
-    cursor: pointer;
-}
-
-/* Pieces */
-.square img.piece {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    pointer-events: none;
+/* pieces */
+.piece {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
-/* History */
+/* history */
 #history {
-    background: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    width: 200px;
-    height: 500px;
-    overflow-y: auto;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  width: 240px;
+  max-height: 520px;
+  overflow-y: auto;
 }
-
 #history h2 {
-    text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
 }
-
 #history-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
-
 #history-list li {
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
 }
 
 /* pop-up */
-#pop-up{
-    position: flex;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 1);
-    color: white;
-    text-align: center;
-    font-size: 1.5rem;
-    z-index: 1000;
+.overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.overlay-content {
+  background: #fff;
+  padding: 2rem 3rem;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  font-size: 1.25rem;
+  color: #333;
 }
 </style>

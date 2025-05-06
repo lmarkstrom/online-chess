@@ -4,10 +4,10 @@
             <h1 class="display-5">Welcome, {{ username }}!</h1>
         </header>
         <div class="row">
-            <div class="col-md-6 mb-4">
-                <h1 class="display-5 mb-4">Join games</h1>
-                <div v-if="open_games.length === 0" class="text-muted">No open games yet.</div>
-                <div v-for="game in open_games" :key="game.id" class="card mb-3 shadow-sm">
+            <div class="col-md-4 mb-4">
+                <h2 class="display-6 mb-4">Join games</h2>
+                <div v-if="open_games.length === 0" class="text-muted">No open games</div>
+                <div v-for="game in openGames" :key="game.id" class="card mb-3 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title fw-bold">{{ game.game_name }}</h5>
                     <p class="card-text mb-1">Host: <strong>{{ game.host }}</strong></p>
@@ -16,8 +16,20 @@
                 </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <h1 class="display-5 mb-4">Create new Game</h1>
+            <div class="col-md-4 mb-4">
+                <h2 class="display-6 mb-4">My games</h2>
+                <div v-if="open_games.length === 0" class="text-muted">No own games</div>
+                <div v-for="game in myGames" :key="game.id" class="card mb-3 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ game.game_name }}</h5>
+                        <p class="card-text mb-1">Host: <strong>{{ game.host }}</strong></p>
+                        <p class="card-text mb-2">Status: {{ getStatus(game) }}</p>
+                        <a :href="'/game/' + game.id" class="btn btn-outline-primary btn-sm">Join</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h2 class="display-6 mb-4">Create new Game</h2>
                 <form @submit.prevent="createGame()">
                     <input
                         id="gameName"
@@ -27,7 +39,7 @@
                         placeholder="Enter game name..."
                         required
                     />
-                    <button type="submit" class="btn btn-dark float-end">Create</button>
+                    <button type="submit" class="btn btn-dark float-end mt-2">Create</button>
                 </form>
             </div>
       </div>
@@ -48,6 +60,18 @@ export default {
         open_games: [],
         game_name: "",
     }),
+    computed: {
+    openGames() {
+      return this.open_games.filter(
+        game => game.user_2 === null && game.user_1 !== this.user_id
+      );
+    },
+    myGames() {
+      return this.open_games.filter(
+        game => game.user_1 === this.user_id || game.user_2 === this.user_id
+      );
+    },
+  },
     mounted() {
         const { getters } = this.$store;
         this.username = getters.getUsername;
@@ -105,7 +129,7 @@ export default {
 }
 
 header h1 {
-    font-size: 2em;
+    font-size: 3em;
     color: #333;
 }
 </style>
