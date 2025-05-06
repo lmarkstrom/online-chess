@@ -18,6 +18,22 @@ privateRouter.post("/:game_id/fetchGameData", (req, res) => {
     });
   });
 
+privateRouter.post("/joinGame", async (req, res) => {
+  const { game_id, user_id, username } = req.body;
+  const game = model.findGameById(game_id);
+  if (game.opponent) {
+    return res.status(400).send("Game already has two players");
+  }
+  game.opponent = username;
+  game.user_2 = user_id;
+  await db.run(
+    "UPDATE games SET opponent = ?, user_2 = ? WHERE id = ?",
+    [username, user_id, game_id],
+  );
+  model.broadcastGameUpdate(game);
+  res.status(200).send("Joined game successfully");
+});
+
 privateRouter.post("/newGame", async (req, res) => {
   const { user_1, username, game_name } = req.body;
   const new_game = new Chess();

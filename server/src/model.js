@@ -75,15 +75,9 @@ class Model {
   broadcastNewGame(game) {
     this.io.emit("newGame", game);
   }
-
-  broadcastOn(id) {
-    this.io.emit("tempBlock", {id: id});
+  broadcastGameUpdate(game) {
+    this.io.emit("gameUpdate", game);
   }
-
-  broadcastOff(id) {
-    this.io.emit("tempUnBlock", {id: id});
-  }
-
   broadcastBooked(id, student){
     this.io.emit("booked", {id: id, student: student});
   }

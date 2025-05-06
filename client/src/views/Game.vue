@@ -38,6 +38,9 @@
   </template>
   
   <script>
+import { io } from "socket.io-client";
+const socket = io("http://localhost:8989");
+
   export default {
     name: "GameView",
     components: {},
@@ -51,16 +54,13 @@
         moveHistory: [],
     }),
     mounted() {
-        const { getters } = this.$store;
-        this.user_id = getters.getUserId;
-        this.user_1 = getters.getUsername;
-        this.game_id = getters.getGameId;
-        if(getters.getOpponent === null){
-            this.fetchGame();
-            // skapa lyssnare på att spelare joinar
-        } {
-            // joina match
-        }
+        this.fetchGame(game_id);
+        socket.on("gameUpdate", (data) => {
+            this.board = data.board;
+            this.moveHistory = data.moveHistory;
+            this.currentPlayer = data.currentPlayer;
+            this.user_2 = data.user_2;
+        });
     },
     methods: {
         async fetchGame() {
@@ -71,8 +71,10 @@
                 },
                 body: JSON.stringify({ game_id: this.game_id}),
             }). then((res) => res.json()).then((data) => {
-                this.currentPlayer = data.currentPlayer;
+                this.user_id = data.user_id;
+                this.user_1 = data.user_1;
                 this.user_2 = data.user_2;
+                this.currentPlayer = data.currentPlayer;
                 this.board = data.board;
                 this.moveHistory = data.moveHistory;
             });

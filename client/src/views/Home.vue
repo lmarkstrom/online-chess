@@ -12,7 +12,7 @@
                     <h5 class="card-title fw-bold">{{ game.game_name }}</h5>
                     <p class="card-text mb-1">Host: <strong>{{ game.host }}</strong></p>
                     <p class="card-text mb-2">Status: {{ getStatus(game) }}</p>
-                    <a :href="'/game/' + game.id" class="btn btn-outline-primary btn-sm">Join</a>
+                    <a :href="'/game/' + game.id" class="btn btn-outline-primary btn-sm" @click="joinGame(game.id)">Join</a>
                 </div>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                         <h5 class="card-title fw-bold">{{ game.game_name }}</h5>
                         <p class="card-text mb-1">Host: <strong>{{ game.host }}</strong></p>
                         <p class="card-text mb-2">Status: {{ getStatus(game) }}</p>
-                        <a :href="'/game/' + game.id" class="btn btn-outline-primary btn-sm">Join</a>
+                         <a class="btn btn-outline-primary btn-sm">Join</a> <!--:href="'/game/'+ game.id" -->
                     </div>
                 </div>
             </div>
@@ -116,6 +116,21 @@ export default {
             if (game.user_2 === null) {
                 return "Waiting for player 2...";
             } else return "Game started!";
+        },
+        joinGame(game_id) {
+            const { push } = this.$router;
+            const { commit } = this.$store;
+            fetch("/home/joinGame", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ game_id: game_id, user_2: this.user_id }),
+            }).then((res) => res.json()).then((data) => {
+                console.log("Game joined:", data);
+                commit("setGameId", game.id);
+                push(`/game/${game.id}`);
+            });
         },
     },
     
