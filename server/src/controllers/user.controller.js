@@ -38,7 +38,7 @@ publicRouter.post("/login", async (req, res) => {
           }else {
             model.createSession(username, id);
             console.log("Session created" + model.sessions);
-            return res.cookie("session-id", id).send(String(1));
+            return res.cookie("session-id", id).send(String(user.id));
           }
         });
       }
