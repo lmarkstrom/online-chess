@@ -1,6 +1,5 @@
 import { Router } from "express";
 import model from "../model.js";
-import { game } from "../index.js";
 import { Chess } from "../models/chess.js";
 import db from "../db.js";
 
@@ -60,8 +59,8 @@ privateRouter.post("/newGame", async (req, res) => {
 });
   
 publicRouter.post("/move", (req, res) => {
-    const { row, col } = req.body;
-  
+    const { row, col, game_id } = req.body;
+    const game = model.findGameById(game_id);
     game.handleUserClick(row, col);
     res.json({
       board: game.board,

@@ -16,7 +16,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
-export const game = new Chess();
+// export const game = new Chess();
 
 const { Theme } = betterLogging;
 betterLogging(console, {

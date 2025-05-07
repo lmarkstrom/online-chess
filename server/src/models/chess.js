@@ -116,6 +116,8 @@ export class Chess {
     }
 
     handleUserClick(row, col) {
+        console.log("Clicked: ", row, col);
+        console.log("Current Piece: ", this.currentPiece);
         if (this.gameOver) return;
         if(this.currentPiece === null || (this.board[row][col] !== null && this.board[row][col].color === this.currentPlayer)) {
             if(this.board[row][col] !== null){

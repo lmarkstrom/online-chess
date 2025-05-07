@@ -88,6 +88,7 @@ const socket = io("http://localhost:8989");
                 headers: {
                 "Content-Type": "application/json",
                 },
+                body: JSON.stringify({game_id: this.game_id, row,col}),
             });
 
             const data = await res.json();
