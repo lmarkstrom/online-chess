@@ -54,7 +54,11 @@ const socket = io("http://localhost:8989");
         moveHistory: [],
     }),
     mounted() {
-        this.fetchGame(game_id);
+        const { getters } = this.$store;
+        this.game_id = this.$route.params.game_id;
+        this.user_id = getters.getUserId;
+        console.log("Mount game: ", this.game_id);
+        this.fetchGame(this.game_id);
         socket.on("gameUpdate", (data) => {
             this.board = data.board;
             this.moveHistory = data.moveHistory;
@@ -71,7 +75,6 @@ const socket = io("http://localhost:8989");
                 },
                 body: JSON.stringify({ game_id: this.game_id}),
             }). then((res) => res.json()).then((data) => {
-                this.user_id = data.user_id;
                 this.user_1 = data.user_1;
                 this.user_2 = data.user_2;
                 this.currentPlayer = data.currentPlayer;

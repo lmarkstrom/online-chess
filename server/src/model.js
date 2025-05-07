@@ -72,8 +72,8 @@ class Model {
   removeGame(id) {
     delete this.games[id];
   }
-  broadcastNewGame(game) {
-    this.io.emit("newGame", game);
+  broadcastGamelistUpdate(game) {
+    this.io.emit("gamelistUpdate", game);
   }
   broadcastGameUpdate(game) {
     this.io.emit("gameUpdate", game);

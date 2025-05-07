@@ -31,7 +31,8 @@ privateRouter.post("/joinGame", async (req, res) => {
     [username, user_id, game_id],
   );
   model.broadcastGameUpdate(game);
-  res.status(200).send("Joined game successfully");
+  model.broadcastGamelistUpdate(game);
+  res.status(200).send({sucess: true});
 });
 
 privateRouter.post("/newGame", async (req, res) => {
@@ -53,7 +54,7 @@ privateRouter.post("/newGame", async (req, res) => {
   }
   console.log("ID found: " + game_id);
   model.createGame(game_id, game_name, username, user_1, null, board_string, history_string);
-  model.broadcastNewGame(model.findGameById(game_id));
+  model.broadcastGamelistUpdate(model.findGameById(game_id));
   console.log("Game created" + game_id);
   res.send({ game_id });
 });

@@ -12,7 +12,7 @@
                     <h5 class="card-title fw-bold">{{ game.game_name }}</h5>
                     <p class="card-text mb-1">Host: <strong>{{ game.host }}</strong></p>
                     <p class="card-text mb-2">Status: {{ getStatus(game) }}</p>
-                    <a :href="'/game/' + game.id" class="btn btn-outline-primary btn-sm" @click="joinGame(game.id)">Join</a>
+                    <a class="btn btn-outline-primary btn-sm" @click="joinGame(game.id)">Join</a>
                 </div>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                         <h5 class="card-title fw-bold">{{ game.game_name }}</h5>
                         <p class="card-text mb-1">Host: <strong>{{ game.host }}</strong></p>
                         <p class="card-text mb-2">Status: {{ getStatus(game) }}</p>
-                         <a class="btn btn-outline-primary btn-sm">Join</a> <!--:href="'/game/'+ game.id" -->
+                         <a class="btn btn-outline-primary btn-sm" @click="openGame(game.id)">Open</a>
                     </div>
                 </div>
             </div>
@@ -77,28 +77,32 @@ export default {
         this.username = getters.getUsername;
         this.user_id = getters.getUserId;
         console.log("User ID:", this.user_id);
-        fetch("/home/fetchGames", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ user_id: this.user_id}),
-        }).then((res) => res.json()).then((data) => {
-            this.open_games = data;
-            console.log("Open games:", this.open_games);
-        });
-        socket.on("newGame", (game) => {
+        this.fetchGames();
+        socket.on("gamelistUpdate", (game) => {
             this.$nextTick(() => {
-                this.open_games.push(game);
+                this.fetchGames();
             });
-            console.log("New game created:", game);
         });
     },
     methods: {
+        async fetchGames() {
+            const { commit } = this.$store;
+            fetch("/home/fetchGames", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ user_id: this.user_id}),
+            }).then((res) => res.json()).then((data) => {
+                this.open_games = data;
+                console.log("Open games:", this.open_games);
+            });
+        },
         async createGame() {
             const { push } = this.$router;
             const { commit } = this.$store;
             console.log("Creates new game")
+            console.log("Game name:", this.user_id);
             const id = await fetch("/home/newGame", {
                 method: "POST",
                 headers: {
@@ -127,10 +131,17 @@ export default {
                 },
                 body: JSON.stringify({ game_id: game_id, user_2: this.user_id }),
             }).then((res) => res.json()).then((data) => {
-                console.log("Game joined:", data);
-                commit("setGameId", game.id);
-                push(`/game/${game.id}`);
+                console.log("Game joined:", data.success);
+                commit("setGameId", game_id);
+                push(`/game/${game_id}`);
             });
+        },
+        openGame(game_id) {
+            const { push } = this.$router;
+            const { commit } = this.$store;
+            console.log("Open game:", game_id);
+            commit("setGameId", game_id);
+            push(`/game/${game_id}`);
         },
     },
     
