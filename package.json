@@ -21,6 +21,7 @@
   "version": "1.0.0",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "connect-history-api-fallback": "^2.0.0",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
     "uuid": "^11.1.0"
