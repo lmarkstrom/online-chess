@@ -7,7 +7,7 @@
             <div class="col-md-6 mb-4">
                 <h1 class="display-5 mb-4">Join games</h1>
                 <div v-if="open_games.length === 0" class="text-muted">No open games yet.</div>
-                <div v-for="game in open_games" :key="game.id" class="card mb-3 shadow-sm">
+                <div v-for="game in openGames" :key="game.id" class="card mb-3 shadow-sm">
 
                 <div class="card-body">
                     <h5 class="card-title fw-bold">{{ game.game_name }}</h5>
@@ -63,23 +63,24 @@ export default {
         kickTimer: null,
     }),
     computed: {
-    openGames() {
-      return this.open_games.filter(
-        game => game.user_2 === null && game.user_1 !== this.user_id
-      );
+        openGames() {
+            return this.open_games.filter(
+                game => game.user_2 === null && game.user_1 !== this.user_id
+            );
+        },
+        myGames() {
+            return this.open_games.filter(
+                game => game.user_1 === this.user_id || game.user_2 === this.user_id
+            );
+        },
     },
-    myGames() {
-      return this.open_games.filter(
-        game => game.user_1 === this.user_id || game.user_2 === this.user_id
-      );
-    },
-  },
     mounted() {
         const { getters } = this.$store;
         this.username = getters.getUsername;
         this.user_id = getters.getUserId;
         console.log("User ID:", this.user_id);
         this.fetchGames();
+        console.log("Games: ", this.open_games);
         socket.on("gamelistUpdate", (game) => {
             this.$nextTick(() => {
                 this.fetchGames();

@@ -8,10 +8,8 @@ const publicRouter = Router();
 const privateRouter = Router();
 
 publicRouter.post("/login", async (req, res) => {
-    console.log("Login request");
     const { username, password } = req.body;
     const {id} = req.session;
-    console.log(username);
     const regex = /^(?=.*[A-Za-z])(?=.*\d).{3,}$/;
     let result = -1;
     if (!(regex.test(password) )) { // && regex.test(username)
@@ -23,9 +21,6 @@ publicRouter.post("/login", async (req, res) => {
         result = user.id;
     } else return res.status(401).send(String(-1));
     let rowRes = null;
-    console.log("User found" + user);
-    console.log(username + password);
-  
     db.each("SELECT * FROM users WHERE username = ?", [username], async (err, row) => {
       if(row === undefined){
         console.log("User not found");

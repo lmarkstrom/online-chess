@@ -18,8 +18,6 @@ class Model {
     await db.each("SELECT * FROM games WHERE winner IS NULL", (err, row) => {
       this.games[row.id] = new Game(row.id, row.game_name, row.host, row.opponent, row.user_1, row.user_2, row.game_board, row.game_history, row.current_player, row.current_piece, row.winner, row.check_, row.enpassant);
     });
-    console.log(this.users);
-    console.log(this.games);
   }
 
   findGameById(id) {
@@ -37,7 +35,6 @@ class Model {
   }
   createSession(user_id, id) {
     this.sessions[id] = {user_id, time: new Date()};
-    console.log("Created session " + this.sessions[id]);
     return id;
   }
 
@@ -45,7 +42,6 @@ class Model {
     for (const id in this.sessions) {
       if (this.sessions[id].user_id === user_id) {
         delete this.sessions[id];
-        console.log(this.sessions);
         return;
       }
     }
@@ -64,9 +60,7 @@ class Model {
   }
 
   createGame(id, game_name, host, user_1, user_2, game_board, game_history) {
-    console.log("1");
     this.games[id] = new Game(id, game_name, host, null, user_1, user_2, game_board, game_history, "w", null, null, null, null);
-    console.log("Game created ok!");
   }
 
   addUser(id, username) {

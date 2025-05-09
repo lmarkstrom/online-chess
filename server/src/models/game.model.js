@@ -18,7 +18,6 @@ class Game extends Chess {
       this.enpassant = enpassant_text ? this.parseJSON(enpassant_text) : new EnPassant();
     }
     parseString(text) {
-      console.log("Parsing string:", text);
         try {
             return JSON.parse(text);
         } catch (e) {

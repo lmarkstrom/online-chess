@@ -59,6 +59,7 @@
         this.game_id = this.$route.params.game_id;
         this.user_id = getters.getUserId;
         console.log("Mount game: ", this.game_id);
+        console.log("User ID:", this.user_id);
         this.fetchGame(this.game_id);
         socket.on("gameUpdate", (data) => {
             this.board = data.board;
