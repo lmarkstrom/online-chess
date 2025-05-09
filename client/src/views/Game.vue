@@ -8,7 +8,7 @@
         </div>
         <div id="app">
             <div id="game">
-                <div id="board">
+                <div id="board" @keydown=emitUpdate()>
                     <div
                         v-for="(square, index) in board.flat()"
                         :key="index"
@@ -38,8 +38,9 @@
   </template>
   
   <script>
-import { io } from "socket.io-client";
-const socket = io("http://localhost:8989");
+    import { io } from "socket.io-client";
+
+    const socket = io("http://localhost:8989");
 
   export default {
     name: "GameView",
@@ -65,6 +66,11 @@ const socket = io("http://localhost:8989");
             this.currentPlayer = data.currentPlayer;
             this.user_2 = data.user_2;
         });
+        this.emitUpdate();
+        socket.on("sessionTimeout", (msg) => {
+            console.log("sessionTimeout");
+            this.logout();
+        });
     },
     methods: {
         async fetchGame() {
@@ -83,6 +89,7 @@ const socket = io("http://localhost:8989");
             });
         },
         async handleClick(row, col) {
+            emitUpdate();
             const res = await fetch("/move", {
                 method: "POST",
                 headers: {
@@ -98,6 +105,32 @@ const socket = io("http://localhost:8989");
         getSquareStyle(row, col) {
             const color = (row + col) % 2 === 0 ? "#eee" : "#444";
             return { backgroundColor: color };
+        },
+        emitUpdate() {
+            console.log("emitUpdate");
+            socket.emit("updateTime", this.addedTimes);
+        },
+        logout() {
+        const { commit } = this.$store;
+        const { push } = this.$router;
+        fetch("/game/logout", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+            username: this.$store.getters.getUsername,
+            }),
+        })
+            .then((response) => {
+            if (response.ok) {
+                commit("setAuthenticated", false);
+                console.log("Logout successful");
+                push("/login");
+            } else {
+                console.error("Logout failed");
+            }
+        })
         },
     },
   };

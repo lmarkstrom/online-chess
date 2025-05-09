@@ -53,6 +53,7 @@ privateRouter.post("/logout", (req, res) => {
 
 publicRouter.post("/register", async (req, res) => {
     const { username, password } = req.body;
+    const {id} = req.session;
     
     const user = model.findUserByName(username);
     if (user !== undefined) {
@@ -64,12 +65,9 @@ publicRouter.post("/register", async (req, res) => {
       const statement = await db.prepare("INSERT INTO users (username, password) VALUES (?, ?)");
       statement.run(username, hash);
       statement.finalize();
-      db.each("SELECT last_insert_rowid() AS id", (err, row) => {
-        model.createSession(username, row.id);
-        return res
-          .cookie("session-id", row.id)
-          .json({ success: true, userId: row.id, username });
-      });
+      model.addUser(id, username);
+      model.createSession(username, id);
+      return res.cookie("session-id", id).json({ success: true, userId: id, username });
     });
 });
 

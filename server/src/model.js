@@ -69,6 +69,10 @@ class Model {
     console.log("Game created ok!");
   }
 
+  addUser(id, username) {
+    this.users[id] = new User(id, username);
+  }
+
   removeGame(id) {
     delete this.games[id];
   }
