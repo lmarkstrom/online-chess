@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top custom-nav">
     <button
       class="navbar-toggler mx-2 mb-2"
       type="button"
@@ -87,6 +87,10 @@ export default {
 html,
 body {
   /* https://designs.ai/colors */
-  background-color: #a7d7c5;
+  background-color: #eae9ee;
+  padding-top: 35px;
+}
+.custom-nav {
+  z-index: 2000;
 }
 </style>

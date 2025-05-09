@@ -1,18 +1,38 @@
 import { Router } from "express";
 import model from "../model.js";
-import { game } from "../index.js";
-import { Chess } from "../chess.js";
+import { Chess } from "../models/chess.js";
 import db from "../db.js";
 
 const publicRouter = Router();
 const privateRouter = Router();
 
-publicRouter.get("/game", (req, res) => {
-    res.json({
+privateRouter.post("/:game_id/fetchGameData", (req, res) => {
+    const { game_id } = req.params;
+    const game = model.findGameById(game_id);
+    res.send({
+      currentPlayer: game.currentPlayer,
+      user_2: game.opponent,
       board: game.board,
       moveHistory: game.moveHistory,
     });
   });
+
+privateRouter.post("/joinGame", async (req, res) => {
+  const { game_id, user_id, username } = req.body;
+  const game = model.findGameById(game_id);
+  if (game.opponent) {
+    return res.status(400).send("Game already has two players");
+  }
+  game.opponent = username;
+  game.user_2 = user_id;
+  await db.run(
+    "UPDATE games SET opponent = ?, user_2 = ? WHERE id = ?",
+    [username, user_id, game_id],
+  );
+  model.broadcastGameUpdate(game);
+  model.broadcastGamelistUpdate(game);
+  res.status(200).send({sucess: true});
+});
 
 privateRouter.post("/newGame", async (req, res) => {
   const { user_1, username, game_name } = req.body;
@@ -21,20 +41,26 @@ privateRouter.post("/newGame", async (req, res) => {
   const history_string = JSON.stringify(new_game.moveHistory);
   let game_id = null;
   await db.run(
-    "INSERT INTO games (game_name, host, user_1, user_2, game_board, game_history, turn, finished) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-    [game_name, username, user_1, null, board_string, history_string, new_game.currentPlayer, 0],
+    "INSERT INTO games (game_name, host, opponent, user_1, user_2, game_board, game_history, current_player, current_piece, winner, check_, enpassant) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [game_name, username, null, user_1, null, board_string, history_string, new_game.currentPlayer, null, null, null, null],
   );
-  db.each("SELECT last_insert_rowid() AS id", (err, row) => {
-    model.createGame(game_id, game_name, username, user_1, null, board_string, history_string, new_game.currentPlayer);
-    model.broadcastNewGame(model.findGameById(game_id));
+  await db.each("SELECT last_insert_rowid() AS id", (err, row) => {
     game_id = row.id;
   });
-  res.send({ id: game_id });
+  if(game_id === null) {
+    console.log("Game ID is null");
+    return res.status(500).send("Error creating game");
+  }
+  console.log("ID found: " + game_id);
+  model.createGame(game_id, game_name, username, user_1, null, board_string, history_string);
+  model.broadcastGamelistUpdate(model.findGameById(game_id));
+  console.log("Game created" + game_id);
+  res.send({ game_id });
 });
   
 publicRouter.post("/move", (req, res) => {
-    const { row, col } = req.body;
-  
+    const { row, col, game_id } = req.body;
+    const game = model.findGameById(game_id);
     game.handleUserClick(row, col);
     res.json({
       board: game.board,
