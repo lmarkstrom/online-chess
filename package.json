@@ -16,12 +16,15 @@
     "server:lint": "cd server && npm run lint",
     "server:lint:fix": "cd server && npm run lint:fix",
     "server:start": "cd server && npm run start",
-    "start": "npm run client:build && npm run server:start"
+    "start": "npm run client:build && npm run server:start",
+    "format": "prettier --write ."
   },
   "version": "1.0.0",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
     "connect-history-api-fallback": "^2.0.0",
+    "prettier": "^2.8.8",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
     "uuid": "^11.1.0"

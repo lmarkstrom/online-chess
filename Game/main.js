@@ -1,3 +1,3 @@
-import { Chess } from './chess.js';
+import { Chess } from "./chess.js";
 
 const game = new Chess();

@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import store from "../store";
 import Login from "../views/Login.vue";
 import Home from "../views/Home.vue";
 import Register from "../views/Register.vue";
@@ -16,7 +15,7 @@ const routes = [
   },
   {
     path: "/register",
-    component: Register
+    component: Register,
   },
   {
     path: "/home",
@@ -25,7 +24,7 @@ const routes = [
   {
     path: "/game/:game_id",
     component: Game,
-  }
+  },
 ];
 
 const router = createRouter({

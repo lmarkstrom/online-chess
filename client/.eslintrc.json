@@ -18,9 +18,7 @@
     "no-param-reassign": [
       "error",
       {
-        "ignorePropertyModificationsFor": [
-          "state"
-        ],
+        "ignorePropertyModificationsFor": ["state"],
         "props": true
       }
     ],

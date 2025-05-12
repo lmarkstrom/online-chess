@@ -4,8 +4,8 @@ export default createStore({
   state: {
     authenticated: false,
     username: "",
-    user_id: "",
-    game_id: null,
+    userID: "",
+    gameID: null,
     opponent: null,
     times: [],
     curAssistantTime: {},
@@ -18,7 +18,7 @@ export default createStore({
       return state.username;
     },
     getUserId(state) {
-      return state.user_id;
+      return state.userID;
     },
     getTimes(state) {
       return state.times;
@@ -30,7 +30,7 @@ export default createStore({
       return state.opponent;
     },
     getGameId(state) {
-      return state.game_id;
+      return state.gameID;
     },
   },
   mutations: {
@@ -40,24 +40,26 @@ export default createStore({
     setUsername(state, username) {
       state.username = username;
     },
-    setUserId(state, user_id) {
-      state.user_id = user_id;
+    setUserId(state, userID) {
+      state.userID = userID;
     },
-    addTime(state, newTime){
+    addTime(state, newTime) {
       state.times.push(newTime);
-      state.times.sort((a, b) => 
-        parseInt(a.time.replace(":","")) - parseInt(b.time.replace(":",""))
+      state.times.sort(
+        (a, b) =>
+          parseInt(a.time.replace(":", ""), 10) -
+          parseInt(b.time.replace(":", ""), 10)
       );
     },
-    removeTimes(state, times){
+    removeTimes(state, times) {
       state.times = state.times.filter((time) => !times.includes(time.id));
     },
-    setAssistantTime(state, newAssistantTime){
+    setAssistantTime(state, newAssistantTime) {
       state.curAssistantTime = newAssistantTime;
     },
-    setGameId(state, game_id) {
-      state.game_id = game_id;
-    }
+    setGameId(state, gameID) {
+      state.gameID = gameID;
+    },
     // setBooked(state, time){
     //   state.times[time.id].booked = true;
     //   state.times[time.id].booked_by = time.student;

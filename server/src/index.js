@@ -4,12 +4,12 @@ import expressSession from "express-session";
 import socketIOSession from "express-socket.io-session";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import history from "connect-history-api-fallback";
 import { resolvePath } from "./util.js";
 import model from "./model.js";
 import userController from "./controllers/user.controller.js";
 import gameController from "./controllers/game.controller.js";
-import { requireAuth } from "./middleware/requireAuth.js";
-import history from "connect-history-api-fallback";
+import requireAuth from "./middleware/requireAuth.js";
 
 const port = 8989;
 const app = express();
@@ -71,7 +71,6 @@ app.use("/game", requireAuth, gameController.privateRouter);
 
 // Initialize a model
 model.init(io);
-
 
 io.on("connection", (socket) => {
   const { session } = socket.handshake;
