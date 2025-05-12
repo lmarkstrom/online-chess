@@ -108,7 +108,7 @@
         },
         emitUpdate() {
             console.log("emitUpdate");
-            socket.emit("updateTime", this.addedTimes);
+            socket.emit("updateTime");
         },
         logout() {
         const { commit } = this.$store;

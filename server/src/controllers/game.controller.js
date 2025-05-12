@@ -74,4 +74,14 @@ privateRouter.post("/fetchGames", async (req, res) => {
     return res.send(games);
 });
 
+privateRouter.post("/fetchWinRatio", async (req, res) => {
+    const { username } = req.body;
+    console.log("Fetching win ratio for user: " + username);
+    const winRatio = model.getWinRatio(username);
+    console.log("Win ratio for user " + username + ": " + winRatio);
+    return res.send({ winRatio });
+
+}
+);
+
 export default { publicRouter, privateRouter };
