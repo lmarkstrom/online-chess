@@ -4,8 +4,8 @@
             <h1 class="display-5">Welcome, {{ username }}!</h1>
         </header>
         <div class="row" @keydown="emitUpdate()">
+            <h2 class="display-8 mb-4">Current win ratio: {{ winratio }}</h2>
             <div class="col-md-6 mb-4">
-                <h2 class="display-6 mb-4">Current win ratio: {{ winratio }}</h2>
                 <h1 class="display-5 mb-4">Join games</h1>
                 <div v-if="open_games.length === 0" class="text-muted">No open games yet.</div>
                 <div v-for="game in openGames" :key="game.id" class="card mb-3 shadow-sm">
@@ -103,9 +103,9 @@ export default {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ username: this.username}),
+                body: JSON.stringify({ user_id: this.user_id}),
             }).then((res) => res.json()).then((data) => {
-                this.winratio = data.winRatio * 100 + "%";
+                this.winratio = (data.winRatio * 100).toFixed(2) + "%";
                 console.log("Win ratio:", this.winratio);
             });
         },
