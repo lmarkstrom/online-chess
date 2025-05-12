@@ -9,7 +9,6 @@ import model from "./model.js";
 import userController from "./controllers/user.controller.js";
 import gameController from "./controllers/game.controller.js";
 import { requireAuth } from "./middleware/requireAuth.js";
-import { Chess } from "./chess.js";
 import history from "connect-history-api-fallback";
 
 const port = 8989;
