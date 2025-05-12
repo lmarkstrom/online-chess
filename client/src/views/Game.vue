@@ -6,6 +6,15 @@
                 <p><strong>Game ID:</strong> {{ game_id }}</p>
             </div>
         </div>
+        <div v-if="user_2 !== null" class="top-info">
+            <div class="info-content">
+                <p><strong>Game ID:</strong> {{ game_id }}</p>
+                <p></p>
+                <p><strong>Your Color:</strong> {{ yourColor }}</p>
+                <p></p>
+                <p><strong>Turn:</strong> {{ turn }}</p>
+            </div>
+        </div>
         <div id="app">
             <div id="game">
                 <div id="board" @keydown=emitUpdate()>
@@ -17,11 +26,12 @@
                         @click="handleClick(Math.floor(index / 8), index % 8)"
                     >
                         <img
-                        v-if="square"
+                        v-if="square && square.img"
                         :src="square.img"
                         :alt="square.name"
                         class="piece"
                         />
+                        <!-- {{ printSquare(square.img) }} -->
                     </div>
                 </div>
             </div>
@@ -54,6 +64,18 @@
         board: [],
         moveHistory: [],
     }),
+    computed: {
+      yourColor() {
+        if (this.user_id === this.user_1) return 'White';
+        if (this.user_id === this.user_2) return 'Black';
+        return 'Unknown';
+      },
+      turn() {
+        if (this.currentPlayer === "w") return 'White';
+        if (this.currentPlayer === "b") return 'Black';
+        return 'Unknown';
+      },
+    },
     mounted() {
         const { getters } = this.$store;
         this.game_id = this.$route.params.game_id;
@@ -65,6 +87,7 @@
             this.board = data.board;
             this.moveHistory = data.moveHistory;
             this.currentPlayer = data.currentPlayer;
+            this.user_1 = data.user_1;
             this.user_2 = data.user_2;
         });
         this.emitUpdate();
@@ -72,6 +95,9 @@
             console.log("sessionTimeout");
             this.logout();
         });
+        console.log(this.currentPlayer);
+        console.log(this.turn);
+
     },
     methods: {
         async fetchGame() {
@@ -87,10 +113,18 @@
                 this.currentPlayer = data.currentPlayer;
                 this.board = data.board;
                 this.moveHistory = data.moveHistory;
+                console.log("Game curr: ", this.currentPlayer);
+                console.log("Game turn: ", this.turn);
+                console.log("user_id: ", this.user_id);
+                console.log("user_1: ", this.user_1);
+                console.log("user_2: ", this.user_2);
+                console.log("user_1: ", data.user_1);
+                console.log("user_2: ", data.user_2);
             });
         },
         async handleClick(row, col) {
-            emitUpdate();
+            this.emitUpdate();
+            console.log("handleClick", row, col);
             const res = await fetch("/move", {
                 method: "POST",
                 headers: {
@@ -102,6 +136,7 @@
             const data = await res.json();
             this.board = data.board;
             this.moveHistory = data.moveHistory;
+            this.currentPlayer = data.currentPlayer;
         },
         getSquareStyle(row, col) {
             const color = (row + col) % 2 === 0 ? "#eee" : "#444";
@@ -236,5 +271,19 @@ HTML, body {
   box-shadow: 0 0 20px rgba(0,0,0,0.4);
   font-size: 1.25rem;
   color: #333;
+}
+.top-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.info-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.top-info p {
+  margin: 0 1rem;
 }
 </style>

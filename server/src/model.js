@@ -17,6 +17,7 @@ class Model {
     });
     await db.each("SELECT * FROM games WHERE winner IS NULL", (err, row) => {
       this.games[row.id] = new Game(row.id, row.game_name, row.host, row.opponent, row.user_1, row.user_2, row.game_board, row.game_history, row.current_player, row.current_piece, row.winner, row.check_, row.enpassant);
+      console.log(this.games[row.id]);
     });
   }
 
@@ -61,6 +62,10 @@ class Model {
 
   createGame(id, game_name, host, user_1, user_2, game_board, game_history) {
     this.games[id] = new Game(id, game_name, host, null, user_1, user_2, game_board, game_history, "w", null, null, null, null);
+  }
+
+  updateGame(game, id) {
+    this.games[id] = game;
   }
 
   addUser(id, username) {

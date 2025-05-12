@@ -84,7 +84,7 @@ io.on("connection", (socket) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       socket.emit("sessionTimeout");
-    }, 10000);
+    }, 100000);
   };
 
   resetTimeout();

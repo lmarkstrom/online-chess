@@ -162,7 +162,7 @@ export default {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ game_id: game_id, user_2: this.user_id }),
+                body: JSON.stringify({ game_id: game_id, user_id: this.user_id, username: this.username }),
             }).then((res) => res.json()).then((data) => {
                 console.log("Game joined:", data.success);
                 commit("setGameId", game_id);
