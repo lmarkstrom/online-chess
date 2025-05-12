@@ -9,6 +9,7 @@
         <div v-if="winner !== null" class="overlay">
             <div class="overlay-content">
                 <p>Game over, {{ winnerColor }}, wins!</p>
+                <button class="btn btn-dark" @click=goHome()>Go to Home</button>
             </div>
         </div>
         <div v-if="user_2 !== null" class="top-info">
@@ -189,6 +190,10 @@
                 console.error("Logout failed");
             }
         })
+        },
+        goHome() {
+            const { push } = this.$router;
+            push("/home");
         },
     },
   };

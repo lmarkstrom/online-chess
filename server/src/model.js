@@ -38,7 +38,7 @@ class Model {
                     COUNT(*) AS total_games,
                     SUM(CASE WHEN winner = ? THEN 1 ELSE 0 END) AS total_wins
                 FROM games
-                WHERE user_1 = ? OR user_2 = ?;`,
+                WHERE (user_1 = ? OR user_2 = ?) AND winner IS NOT NULL;`,
                 [userID, userID, userID],
                 (err, row) => {
                     if (err) reject(err);
