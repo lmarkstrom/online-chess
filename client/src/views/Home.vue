@@ -5,6 +5,7 @@
         </header>
         <div class="row" @keydown="emitUpdate()">
             <div class="col-md-6 mb-4">
+                <h2 class="display-6 mb-4">Current win ratio: {{ winratio }}</h2>
                 <h1 class="display-5 mb-4">Join games</h1>
                 <div v-if="open_games.length === 0" class="text-muted">No open games yet.</div>
                 <div v-for="game in openGames" :key="game.id" class="card mb-3 shadow-sm">
@@ -61,6 +62,7 @@ export default {
         open_games: [],
         game_name: "",
         kickTimer: null,
+        winratio: null,
     }),
     computed: {
         openGames() {
@@ -80,7 +82,7 @@ export default {
         this.user_id = getters.getUserId;
         console.log("User ID:", this.user_id);
         this.fetchGames();
-        console.log("Games: ", this.open_games);
+        this.fetchWinRatio();
         socket.on("gamelistUpdate", (game) => {
             this.$nextTick(() => {
                 this.fetchGames();
@@ -90,9 +92,23 @@ export default {
         socket.on("sessionTimeout", (msg) => {
             console.log("sessionTimeout");
             this.logout();
-        });
+        });       
     },
     methods: {
+        async fetchWinRatio() {
+            const { commit } = this.$store;
+            console.log("Fetch win ratio");
+            fetch("/home/fetchWinRatio", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ username: this.username}),
+            }).then((res) => res.json()).then((data) => {
+                this.winratio = data.winRatio * 100 + "%";
+                console.log("Win ratio:", this.winratio);
+            });
+        },
         async fetchGames() {
             const { commit } = this.$store;
             fetch("/home/fetchGames", {
@@ -131,7 +147,7 @@ export default {
         },
         emitUpdate() {
             console.log("emitUpdate");
-            socket.emit("updateTime", this.addedTimes);
+            socket.emit("updateTime");
         },
         logout() {
             const { commit } = this.$store;
