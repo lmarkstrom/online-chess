@@ -116,8 +116,6 @@ export class Chess {
     }
 
     handleUserClick(row, col) {
-        console.log("Clicked: ", row, col);
-        console.log("Current Piece: ", this.currentPiece);
         if (this.gameOver) return;
         if(this.currentPiece === null || (this.board[row][col] !== null && this.board[row][col].color === this.currentPlayer)) {
             if(this.board[row][col] !== null){
@@ -349,14 +347,8 @@ export class Chess {
         }
     }
     promotion(row, col, piece) {
-        console.log("Promotion check")
         let finalRow = piece.color === "w" ? 0 : 7;
-        console.log("Final Row: ", finalRow)
-        console.log("Row: ", row)
-        console.log("Col: ", col)
-        console.log("Piece: ", piece)
         if(piece.name === "pawn" && row === finalRow) {
-            console.log("Promotion")
             this.board[row][col] = new Queen(piece.color, {row: row, col: col});
             this.drawBoard();
         }else console.log("Not a promotion")

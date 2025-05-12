@@ -8,7 +8,7 @@
                 <h2 class="display-6 mb-4">Current win ratio: {{ winratio }}</h2>
                 <h1 class="display-5 mb-4">Join games</h1>
                 <div v-if="open_games.length === 0" class="text-muted">No open games yet.</div>
-                <div v-for="game in open_games" :key="game.id" class="card mb-3 shadow-sm">
+                <div v-for="game in openGames" :key="game.id" class="card mb-3 shadow-sm">
 
                 <div class="card-body">
                     <h5 class="card-title fw-bold">{{ game.game_name }}</h5>
@@ -65,17 +65,17 @@ export default {
         winratio: null,
     }),
     computed: {
-    openGames() {
-      return this.open_games.filter(
-        game => game.user_2 === null && game.user_1 !== this.user_id
-      );
+        openGames() {
+            return this.open_games.filter(
+                game => game.user_2 === null && game.user_1 !== this.user_id
+            );
+        },
+        myGames() {
+            return this.open_games.filter(
+                game => game.user_1 === this.user_id || game.user_2 === this.user_id
+            );
+        },
     },
-    myGames() {
-      return this.open_games.filter(
-        game => game.user_1 === this.user_id || game.user_2 === this.user_id
-      );
-    },
-  },
     mounted() {
         const { getters } = this.$store;
         this.username = getters.getUsername;
@@ -178,7 +178,7 @@ export default {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ game_id: game_id, user_2: this.user_id }),
+                body: JSON.stringify({ game_id: game_id, user_id: this.user_id, username: this.username }),
             }).then((res) => res.json()).then((data) => {
                 console.log("Game joined:", data.success);
                 commit("setGameId", game_id);

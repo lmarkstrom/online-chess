@@ -9,9 +9,11 @@ const privateRouter = Router();
 privateRouter.post("/:game_id/fetchGameData", (req, res) => {
     const { game_id } = req.params;
     const game = model.findGameById(game_id);
+    console.log("Game fetched", game.currentPlayer);
     res.send({
       currentPlayer: game.currentPlayer,
-      user_2: game.opponent,
+      user_1: game.user_1,
+      user_2: game.user_2,
       board: game.board,
       moveHistory: game.moveHistory,
     });
@@ -25,13 +27,15 @@ privateRouter.post("/joinGame", async (req, res) => {
   }
   game.opponent = username;
   game.user_2 = user_id;
+  model.updateGame(game, game_id);
+  console.log("Game updated " + user_id + " " + game_id + " " + username);
   await db.run(
     "UPDATE games SET opponent = ?, user_2 = ? WHERE id = ?",
     [username, user_id, game_id],
   );
   model.broadcastGameUpdate(game);
   model.broadcastGamelistUpdate(game);
-  res.status(200).send({sucess: true});
+  res.status(200).send({success: true});
 });
 
 privateRouter.post("/newGame", async (req, res) => {
@@ -51,20 +55,31 @@ privateRouter.post("/newGame", async (req, res) => {
     console.log("Game ID is null");
     return res.status(500).send("Error creating game");
   }
-  console.log("ID found: " + game_id);
   model.createGame(game_id, game_name, username, user_1, null, board_string, history_string);
   model.broadcastGamelistUpdate(model.findGameById(game_id));
   console.log("Game created" + game_id);
   res.send({ game_id });
 });
   
-publicRouter.post("/move", (req, res) => {
+publicRouter.post("/move", async (req, res) => {
     const { row, col, game_id } = req.body;
     const game = model.findGameById(game_id);
+    console.log(game.currentPiece);
     game.handleUserClick(row, col);
+    console.log(game.currentPiece);
+    model.updateGame(game, game_id);
+    model.broadcastGameUpdate(game);  
+    const board_string = JSON.stringify(game.board);
+    const history_string = JSON.stringify(game.moveHistory);
+    const enpassant_string = JSON.stringify(game.enpassant);
+    await db.run(
+        "UPDATE games SET game_board = ?, game_history = ?, current_player = ?, winner = ?, check_ = ?, enpassant = ? WHERE id = ?",
+        [board_string, history_string, game.currentPlayer, game.winner, game.check, enpassant_string, game_id],
+      );
     res.json({
       board: game.board,
       moveHistory: game.moveHistory,
+      currentPlayer: game.currentPlayer,
     });
 });
 
