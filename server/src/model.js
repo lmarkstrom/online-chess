@@ -7,6 +7,7 @@ class Model {
     this.games = {};
     this.users = {};
     this.sessions = {};
+    this.userStats = {};
     this.io = undefined;
   }
 
@@ -19,6 +20,38 @@ class Model {
       this.games[row.id] = new Game(row.id, row.game_name, row.host, row.opponent, row.user_1, row.user_2, row.game_board, row.game_history, row.current_player, row.current_piece, row.winner, row.check_, row.enpassant);
       console.log(this.games[row.id]);
     });
+    const users = await  
+      db.all("SELECT DISTINCT host AS username FROM games UNION SELECT DISTINCT opponent FROM games;", (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows);
+      });
+    
+
+    console.log("Users:", users);
+
+    // Iterate over each user and fetch their stats
+    for (const user of users) {
+        const username = user.username;
+
+        const stats = await db.get(
+                `SELECT 
+                    COUNT(*) AS total_games,
+                    SUM(CASE WHEN winner = ? THEN 1 ELSE 0 END) AS total_wins
+                FROM games
+                WHERE host = ? OR opponent = ?;`,
+                [username, username, username],
+                (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                }
+            );
+        const userID = this.findUserByName(username);
+        this.userStats[userID] = {
+            totalGames: stats?.total_games || 0,
+            totalWins: stats?.total_wins || 0
+        };
+    }
+    console.log("User stats " + JSON.stringify(this.userStats));
   }
 
   findGameById(id) {
@@ -70,6 +103,19 @@ class Model {
 
   addUser(id, username) {
     this.users[id] = new User(id, username);
+  }
+
+  getWinRatio(username) { 
+    const userID = this.findUserByName(username);
+    const user = this.userStats[userID];
+    if (user) {
+      console.log("Total games: " + user.totalGames);
+      console.log("Total wins: " + user.totalWins);
+      console.log("Win ratio: " + user.totalWins / user.totalGames);
+      return user.totalWins / user.totalGames;
+    }
+    console.log("User not found");
+    return 0;
   }
 
   removeGame(id) {
