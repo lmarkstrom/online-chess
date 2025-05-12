@@ -10,10 +10,17 @@ import userController from "./controllers/user.controller.js";
 import gameController from "./controllers/game.controller.js";
 import { requireAuth } from "./middleware/requireAuth.js";
 import history from "connect-history-api-fallback";
+import https from 'https';
+import fs from 'fs';
+
+const options = {
+  key: fs.readFileSync('./certs/localhost-key.pem'),
+  cert: fs.readFileSync('./certs/localhost.pem'),
+}
 
 const port = 8989;
 const app = express();
-const server = createServer(app);
+const server = https.createServer(options, app);
 const io = new Server(server);
 
 // export const game = new Chess();
