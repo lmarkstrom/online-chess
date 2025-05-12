@@ -62,25 +62,39 @@ privateRouter.post("/newGame", async (req, res) => {
 });
   
 publicRouter.post("/move", async (req, res) => {
-    const { row, col, game_id } = req.body;
+    const { row, col, game_id, user_id, opponent } = req.body;
     const game = model.findGameById(game_id);
     console.log(game.currentPiece);
-    game.handleUserClick(row, col);
     console.log(game.currentPiece);
+    game.handleUserClick(row, col);
     model.updateGame(game, game_id);
     model.broadcastGameUpdate(game);  
     const board_string = JSON.stringify(game.board);
     const history_string = JSON.stringify(game.moveHistory);
     const enpassant_string = JSON.stringify(game.enpassant);
+
+    if(game.gameOver) {
+      model.broadcastWin(game.winner)
+    }
+    const gameWinner = null;
+    let winner = null;
+    if(game.winner !== null) {
+      winner = user_id;
+      model.incrementUserStats(user_id, game.winner, opponent);
+    }
+    
+
+
     await db.run(
         "UPDATE games SET game_board = ?, game_history = ?, current_player = ?, winner = ?, check_ = ?, enpassant = ? WHERE id = ?",
-        [board_string, history_string, game.currentPlayer, game.winner, game.check, enpassant_string, game_id],
+        [board_string, history_string, game.currentPlayer, winner, game.check, enpassant_string, game_id],
       );
     res.json({
       board: game.board,
       moveHistory: game.moveHistory,
       currentPlayer: game.currentPlayer,
     });
+
 });
 
 privateRouter.post("/fetchGames", async (req, res) => {
@@ -90,12 +104,11 @@ privateRouter.post("/fetchGames", async (req, res) => {
 });
 
 privateRouter.post("/fetchWinRatio", async (req, res) => {
-    const { username } = req.body;
-    console.log("Fetching win ratio for user: " + username);
-    const winRatio = model.getWinRatio(username);
-    console.log("Win ratio for user " + username + ": " + winRatio);
+    const { user_id } = req.body;
+    console.log("Fetching win ratio for user: " + user_id);
+    const winRatio = model.getWinRatio(user_id);
+    console.log("Win ratio for user " + user_id + ": " + winRatio);
     return res.send({ winRatio });
-
 }
 );
 

@@ -6,6 +6,11 @@
                 <p><strong>Game ID:</strong> {{ game_id }}</p>
             </div>
         </div>
+        <div v-if="winner !== null" class="overlay">
+            <div class="overlay-content">
+                <p>Game over, {{ winnerColor }}, wins!</p>
+            </div>
+        </div>
         <div v-if="user_2 !== null" class="top-info">
             <div class="info-content">
                 <p><strong>Game ID:</strong> {{ game_id }}</p>
@@ -61,6 +66,7 @@
         user_1: null,
         user_2: null,
         currentPlayer: null,
+        winner: null,
         board: [],
         moveHistory: [],
     }),
@@ -74,6 +80,15 @@
         if (this.currentPlayer === "w") return 'White';
         if (this.currentPlayer === "b") return 'Black';
         return 'Unknown';
+      },
+      winnerColor() {
+        if (this.winner === "Black") return "White";
+        if (this.winner === "White") return "Black";
+        return 'Unknown';
+      },
+      whoIsOpponent() {
+        if (this.user_id === this.user_1) return this.user_2;
+        if (this.user_id === this.user_2) return this.user_1;
       },
     },
     mounted() {
@@ -97,6 +112,12 @@
         });
         console.log(this.currentPlayer);
         console.log(this.turn);
+        socket.on("gameOver", (msg) => {
+            console.log("gameOver");
+            console.log(msg.winner);
+            this.winner = msg.winner;
+            
+        });
 
     },
     methods: {
@@ -130,13 +151,14 @@
                 headers: {
                 "Content-Type": "application/json",
                 },
-                body: JSON.stringify({game_id: this.game_id, row,col}),
+                body: JSON.stringify({game_id: this.game_id, row,col, user_id: this.user_id, opponent: this.whoIsOpponent}),
             });
 
             const data = await res.json();
             this.board = data.board;
             this.moveHistory = data.moveHistory;
             this.currentPlayer = data.currentPlayer;
+
         },
         getSquareStyle(row, col) {
             const color = (row + col) % 2 === 0 ? "#eee" : "#444";

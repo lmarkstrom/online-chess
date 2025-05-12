@@ -46,8 +46,8 @@ export class Chess {
                     if(j === 0 ||j === 7) this.board[i][j] = new Rook("w", {row: i, col: j});
                     else if(j === 1 || j === 6) this.board[i][j] = new Knight("w", {row: i, col: j});
                     else if(j === 2 || j === 5) this.board[i][j] = new Bishop("w", {row: i, col: j});
-                    else if(j === 3) this.board[i][j] = new King("w", {row: i, col: j});
-                    else if(j === 4) this.board[i][j] = new Queen("w", {row: i, col: j});
+                    else if(j === 4) this.board[i][j] = new King("w", {row: i, col: j});
+                    else if(j === 3) this.board[i][j] = new Queen("w", {row: i, col: j});
                     else this.board[i][j] = null;
                 }else this.board[i][j] = null;
             }
@@ -146,6 +146,9 @@ export class Chess {
                     // alert("Invalid move!");
                 }
             }
+        }
+        if(this.gameOver){
+            return this.winner;
         }
     }
     

@@ -21,31 +21,30 @@ class Model {
       console.log(this.games[row.id]);
     });
     const users = await  
-      db.all("SELECT DISTINCT host AS username FROM games UNION SELECT DISTINCT opponent FROM games;", (err, rows) => {
-          if (err) reject(err);
-          else resolve(rows);
-      });
+    db.all("SELECT DISTINCT user_1 AS user_id FROM games UNION SELECT DISTINCT user_2 FROM games;", (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+    });
     
 
     console.log("Users:", users);
 
     // Iterate over each user and fetch their stats
     for (const user of users) {
-        const username = user.username;
+        const userID = user.user_id;
 
         const stats = await db.get(
                 `SELECT 
                     COUNT(*) AS total_games,
                     SUM(CASE WHEN winner = ? THEN 1 ELSE 0 END) AS total_wins
                 FROM games
-                WHERE host = ? OR opponent = ?;`,
-                [username, username, username],
+                WHERE user_1 = ? OR user_2 = ?;`,
+                [userID, userID, userID],
                 (err, row) => {
                     if (err) reject(err);
                     else resolve(row);
                 }
             );
-        const userID = this.findUserByName(username);
         this.userStats[userID] = {
             totalGames: stats?.total_games || 0,
             totalWins: stats?.total_wins || 0
@@ -105,8 +104,7 @@ class Model {
     this.users[id] = new User(id, username);
   }
 
-  getWinRatio(username) { 
-    const userID = this.findUserByName(username);
+  getWinRatio(userID) { 
     const user = this.userStats[userID];
     if (user) {
       console.log("Total games: " + user.totalGames);
@@ -116,6 +114,22 @@ class Model {
     }
     console.log("User not found");
     return 0;
+  }
+
+  incrementUserStats(userID, winner, opponent) {
+    if (this.userStats[userID]) {
+      this.userStats[userID].totalGames++;
+      if (userID === winner) {
+        this.userStats[userID].totalWins++;
+      }
+    }
+    if (this.userStats[opponent]) {
+      this.userStats[opponent].totalGames++;
+      if (opponent === winner) {
+        this.userStats[opponent].totalWins++;
+      }
+    }
+    console.log("User stats updated for " + userID);
   }
 
   removeGame(id) {
@@ -128,7 +142,11 @@ class Model {
     this.io.emit("gameUpdate", game);
   }
   broadcastBooked(id, student){
-    this.io.emit("booked", {id: id, student: student});
+    this.io.emit("booked", {id, student});
+  }
+  broadcastWin(winner) {
+    console.log("Broadcasting win: " + winner);
+    this.io.emit("gameOver", {winner});
   }
 
   /**
