@@ -55,6 +55,7 @@ class Model {
   }
 
   findGameById(id) {
+    console.log(this.games[id]);
     return this.games[id];
   }
   findUserById(id) {

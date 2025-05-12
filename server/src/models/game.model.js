@@ -12,8 +12,8 @@ class Game extends Chess {
       this.user_2 = user_2;
       this.board = this.buildBoard(this.parseString(board_text));
       this.moveHistory = this.parseString(history_text);
-      this.current_player = current_player;
-      this.current_piece = current_piece;
+      this.currentPlayer = current_player;
+      this.currentPiece = current_piece;
       this.winner = winner;
       this.check = !!check;
       this.enpassant = enpassant_text ? this.buildEnPassant(this.parseString(enpassant_text)) : new EnPassant();
