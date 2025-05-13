@@ -53,14 +53,6 @@ const sessionConf = expressSession({
   saveUninitialized: true,
 });
 
-app.use(session({
-  secret: 'your-secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: TIMEOUT },
-  store: new SQLiteStore({ db: 'sessions.sqlite' }) // Use a session store
-}));
-
 app.use(sessionConf);
 io.use(
   socketIOSession(sessionConf, {

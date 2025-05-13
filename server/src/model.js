@@ -71,9 +71,8 @@ class Model {
   clearSessions() {
     for (const id in this.sessions) {
       if(!this.sessionActive(id)){
-          delete this.sessions[id];
-          db.run("DELETE FROM sessions WHERE id = ?", [id]);
-      }
+          this.removeSession(id);
+      } else console.log("Session active: " + id);
     }
   }
   sessionActive(id) {
@@ -82,8 +81,7 @@ class Model {
       const now = new Date();
       const diff = Math.abs(now - session.time);
       if (diff > TIMEOUT) {
-        delete this.sessions[id];
-        db.run("DELETE FROM sessions WHERE id = ?", [id]);
+        this.removeSession(id);
         return false;
       }
       return true;
@@ -91,14 +89,9 @@ class Model {
     return false;
   }
 
-  removeSession(user_id) {
-    for (const id in this.sessions) {
-      if (this.sessions[id].user_id === user_id) {
-        delete this.sessions[id];
-        db.run("DELETE FROM sessions WHERE id = ?", [id]);
-        return;
-      }
-    }
+  removeSession(id) {
+    delete this.sessions[id];
+    db.run("DELETE FROM sessions WHERE id = ?", [id]);
   }
   getGamesForUser(user_id) {
     const games = [];

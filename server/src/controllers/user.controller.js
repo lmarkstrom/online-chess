@@ -40,8 +40,8 @@ publicRouter.post("/login", async (req, res) => {
 });
 
 publicRouter.post("/logout", (req, res) => {
-    const { username } = req.body;
-    model.removeSession(username);
+    const { id } = req.session;
+    model.removeSession(id);
     res.clearCookie("session-id").send("ok");
 });
 
@@ -59,9 +59,10 @@ publicRouter.post("/register", async (req, res) => {
       const statement = await db.prepare("INSERT INTO users (username, password) VALUES (?, ?)");
       statement.run(username, hash);
       statement.finalize();
-      model.addUser(id, username);
-      model.createSession(username, id);
-      return res.cookie("session-id", id).json({ success: true, userId: id, username });
+      const userRes = await db.get("SELECT * FROM users WHERE username = ?", [username]);
+      model.addUser(userRes.id, username);
+      model.createSession(userRes.id, id);
+      return res.cookie("session-id", id).json({ success: true, userId: userRes, username });
     });
 });
 
