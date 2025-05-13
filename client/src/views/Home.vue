@@ -51,8 +51,6 @@
 <script>
 import { io } from "socket.io-client";
 
-const socket = io("https://localhost:8989");
-
 export default {
     name: "Home",
     components: {},
@@ -63,6 +61,7 @@ export default {
         game_name: "",
         kickTimer: null,
         winratio: null,
+        socket: null,
     }),
     computed: {
         openGames() {
@@ -80,16 +79,17 @@ export default {
         const { getters } = this.$store;
         this.username = getters.getUsername;
         this.user_id = getters.getUserId;
+        this.socket = getters.getSocket;
         console.log("User ID:", this.user_id);
         this.fetchGames();
         this.fetchWinRatio();
-        socket.on("gamelistUpdate", (game) => {
+        this.socket.on("gamelistUpdate", (game) => {
             this.$nextTick(() => {
                 this.fetchGames();
             });
         });
         this.emitUpdate();
-        socket.on("sessionTimeout", (msg) => {
+        this.socket.on("sessionTimeout", (msg) => {
             console.log("sessionTimeout");
             this.logout();
         });       
@@ -147,7 +147,7 @@ export default {
         },
         emitUpdate() {
             console.log("emitUpdate");
-            socket.emit("updateTime");
+            this.socket.emit("updateTime");
         },
         logout() {
             const { commit } = this.$store;

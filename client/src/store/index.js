@@ -9,6 +9,7 @@ export default createStore({
     opponent: null,
     times: [],
     curAssistantTime: {},
+    socket: null,
   },
   getters: {
     isAuthenticated(state) {
@@ -26,6 +27,9 @@ export default createStore({
     getGameId(state) {
       return state.game_id;
     },
+    getSocket(state) {
+      return state.socket;
+    },
   },
   mutations: {
     setAuthenticated(state, authenticated) {
@@ -39,6 +43,9 @@ export default createStore({
     },
     setGameId(state, game_id) {
       state.game_id = game_id;
+    },
+    setSocket(state, socket) {
+      state.socket = socket;
     }
   },
   actions: {},

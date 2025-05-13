@@ -56,8 +56,6 @@
   <script>
     import { io } from "socket.io-client";
 
-    const socket = io("https://localhost:8989");
-
   export default {
     name: "GameView",
     components: {},
@@ -70,6 +68,7 @@
         winner: null,
         board: [],
         moveHistory: [],
+        socket: null,
     }),
     computed: {
       yourColor() {
@@ -100,10 +99,11 @@
         const { getters } = this.$store;
         this.game_id = this.$route.params.game_id;
         this.user_id = getters.getUserId;
+        this.socket = getters.getSocket;
         console.log("Mount game: ", this.game_id);
         console.log("User ID:", this.user_id);
         this.fetchGame(this.game_id);
-        socket.on("gameUpdate", (data) => {
+        this.socket.on("gameUpdate", (data) => {
             this.board = data.board;
             this.moveHistory = data.moveHistory;
             this.currentPlayer = data.currentPlayer;
@@ -111,13 +111,13 @@
             this.user_2 = data.user_2;
         });
         this.emitUpdate();
-        socket.on("sessionTimeout", (msg) => {
+        this.socket.on("sessionTimeout", (msg) => {
             console.log("sessionTimeout");
             this.logout();
         });
         console.log(this.currentPlayer);
         console.log(this.turn);
-        socket.on("gameOver", (msg) => {
+        this.socket.on("gameOver", (msg) => {
             console.log("gameOver");
             console.log(msg.winner);
             this.winner = msg.winner;
@@ -171,7 +171,7 @@
         },
         emitUpdate() {
             console.log("emitUpdate");
-            socket.emit("updateTime");
+            this.socket.emit("updateTime");
         },
         logout() {
         const { commit } = this.$store;

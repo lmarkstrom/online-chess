@@ -22,7 +22,7 @@ const app = express();
 const server = https.createServer(options, app);
 export const io = new Server(server);
 
-export const TIMEOUT = 10000;
+export const TIMEOUT = 5000;
 
 const { Theme } = betterLogging;
 betterLogging(console, {
@@ -71,6 +71,7 @@ app.use(express.urlencoded({ extended: true }));
 // Controllers
 app.use(userController.publicRouter);
 app.use(gameController.publicRouter);
+app.use("/game", userController.publicRouter);
 app.use("/home", userController.publicRouter);
 app.use("/home", requireAuth, userController.privateRouter);
 app.use("/home", requireAuth, gameController.privateRouter);
@@ -82,15 +83,18 @@ model.init(io);
 
 io.on("connection", (socket) => {
   const { session } = socket.handshake;
+  const sessionID = session.id;
   let timeout;
 
-  console.log("New socket connection");
+  console.log("New socket connection for session:", sessionID);
 
   const resetTimeout = () => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       socket.emit("sessionTimeout");
-      console.log("Session timed out");
+      console.log("Session timed out:", sessionID);
+      model.removeSession(sessionID);
+      // socket.disconnect(true);
     }, TIMEOUT);
   };
 
@@ -98,7 +102,12 @@ io.on("connection", (socket) => {
 
   socket.on("updateTime", () => {
     console.log("Session updated");
-    session.time = new Date();
+    resetTimeout();
+  });
+
+  socket.on("logIn", ({user_id}) => {
+    console.log("User logged in:", user_id);
+    model.createSession(user_id, sessionID);
     resetTimeout();
   });
 

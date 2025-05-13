@@ -2,6 +2,7 @@ import { Router } from "express";
 import model from "../model.js";
 import db from "../db.js";
 import pkg from "bcrypt";
+import { io } from "../index.js";
 const bcrypt = pkg;
 
 const publicRouter = Router();
@@ -39,9 +40,15 @@ publicRouter.post("/login", async (req, res) => {
     });  
 });
 
-publicRouter.post("/logout", (req, res) => {
+publicRouter.post("/logout", async (req, res) => {
     const { id } = req.session;
     model.removeSession(id);
+    const socket = await io.fetchSockets();
+    for (const s of socket) {
+        if (s.handshake?.session?.id === id) {
+            s.disconnect(true);
+        }
+    }
     res.clearCookie("session-id").send("ok");
 });
 

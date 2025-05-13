@@ -65,6 +65,7 @@ class Model {
   }
   createSession(user_id, id) {
     this.sessions[id] = {user_id, time: new Date()};
+    db.run("DELETE FROM sessions WHERE user_id = ?", [user_id]);
     db.run("INSERT INTO sessions (user_id, id, time) VALUES (?, ?, ?)", [user_id, id, new Date()]);
     return id;
   }

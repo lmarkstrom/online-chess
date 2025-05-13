@@ -61,7 +61,11 @@ publicRouter.post("/move", async (req, res) => {
     const { row, col, game_id, user_id, opponent, playerColor } = req.body;
     const game = model.findGameById(game_id);
     if(playerColor !== game.currentPlayer) {
-      return res.status(400).send("Not your turn");
+      return res.json({
+        board: game.board,
+        moveHistory: game.moveHistory,
+        currentPlayer: game.currentPlayer,
+      });
     }
     game.handleUserClick(row, col);
     model.updateGame(game, game_id);
