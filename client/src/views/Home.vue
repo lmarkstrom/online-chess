@@ -51,7 +51,7 @@
 <script>
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:8989");
+const socket = io("https://localhost:8989");
 
 export default {
     name: "Home",

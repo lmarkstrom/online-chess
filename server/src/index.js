@@ -2,7 +2,6 @@ import betterLogging from "better-logging";
 import express from "express";
 import expressSession from "express-session";
 import socketIOSession from "express-socket.io-session";
-import { createServer } from "http";
 import { Server } from "socket.io";
 import { resolvePath } from "./util.js";
 import model from "./model.js";
@@ -21,9 +20,9 @@ const options = {
 const port = 8989;
 const app = express();
 const server = https.createServer(options, app);
-const io = new Server(server);
+export const io = new Server(server);
 
-// export const game = new Chess();
+export const TIMEOUT = 10000;
 
 const { Theme } = betterLogging;
 betterLogging(console, {
@@ -54,6 +53,14 @@ const sessionConf = expressSession({
   saveUninitialized: true,
 });
 
+app.use(session({
+  secret: 'your-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: TIMEOUT },
+  store: new SQLiteStore({ db: 'sessions.sqlite' }) // Use a session store
+}));
+
 app.use(sessionConf);
 io.use(
   socketIOSession(sessionConf, {
@@ -72,6 +79,7 @@ app.use(express.urlencoded({ extended: true }));
 // Controllers
 app.use(userController.publicRouter);
 app.use(gameController.publicRouter);
+app.use("/home", userController.publicRouter);
 app.use("/home", requireAuth, userController.privateRouter);
 app.use("/home", requireAuth, gameController.privateRouter);
 app.use("/game", requireAuth, gameController.privateRouter);
@@ -90,7 +98,8 @@ io.on("connection", (socket) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       socket.emit("sessionTimeout");
-    }, 100000);
+      console.log("Session timed out");
+    }, TIMEOUT);
   };
 
   resetTimeout();
@@ -107,5 +116,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(port, () => {
-  console.log(`Listening on http://localhost:${port}/`);
+  console.log(`Listening on https://localhost:${port}/`);
 });

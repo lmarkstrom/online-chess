@@ -17,7 +17,6 @@ class Game extends Chess {
       this.winner = winner;
       this.check = !!check;
       this.enpassant = enpassant_text ? this.buildEnPassant(this.parseString(enpassant_text)) : new EnPassant();
-      console.log("Game created", this.id, this.moveHistory, this.current_player, this.current_piece, this.winner, this.check);
     }
     parseString(text) {
         try {

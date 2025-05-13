@@ -9,7 +9,6 @@ const privateRouter = Router();
 privateRouter.post("/:game_id/fetchGameData", (req, res) => {
     const { game_id } = req.params;
     const game = model.findGameById(game_id);
-    console.log("Game fetched", game.currentPlayer);
     res.send({
       currentPlayer: game.currentPlayer,
       user_1: game.user_1,
@@ -28,7 +27,6 @@ privateRouter.post("/joinGame", async (req, res) => {
   game.opponent = username;
   game.user_2 = user_id;
   model.updateGame(game, game_id);
-  console.log("Game updated " + user_id + " " + game_id + " " + username);
   await db.run(
     "UPDATE games SET opponent = ?, user_2 = ? WHERE id = ?",
     [username, user_id, game_id],
@@ -52,20 +50,19 @@ privateRouter.post("/newGame", async (req, res) => {
     game_id = row.id;
   });
   if(game_id === null) {
-    console.log("Game ID is null");
     return res.status(500).send("Error creating game");
   }
   model.createGame(game_id, game_name, username, user_1, null, board_string, history_string);
   model.broadcastGamelistUpdate(model.findGameById(game_id));
-  console.log("Game created" + game_id);
   res.send({ game_id });
 });
   
 publicRouter.post("/move", async (req, res) => {
-    const { row, col, game_id, user_id, opponent } = req.body;
+    const { row, col, game_id, user_id, opponent, playerColor } = req.body;
     const game = model.findGameById(game_id);
-    console.log(game.currentPiece);
-    console.log(game.currentPiece);
+    if(playerColor !== game.currentPlayer) {
+      return res.status(400).send("Not your turn");
+    }
     game.handleUserClick(row, col);
     model.updateGame(game, game_id);
     model.broadcastGameUpdate(game);  
@@ -105,9 +102,7 @@ privateRouter.post("/fetchGames", async (req, res) => {
 
 privateRouter.post("/fetchWinRatio", async (req, res) => {
     const { user_id } = req.body;
-    console.log("Fetching win ratio for user: " + user_id);
     const winRatio = model.getWinRatio(user_id);
-    console.log("Win ratio for user " + user_id + ": " + winRatio);
     return res.send({ winRatio });
 }
 );

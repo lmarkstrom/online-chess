@@ -56,7 +56,7 @@
   <script>
     import { io } from "socket.io-client";
 
-    const socket = io("http://localhost:8989");
+    const socket = io("https://localhost:8989");
 
   export default {
     name: "GameView",
@@ -90,6 +90,10 @@
       whoIsOpponent() {
         if (this.user_id === this.user_1) return this.user_2;
         if (this.user_id === this.user_2) return this.user_1;
+      },
+     yourPlayerColor() {
+        if (this.user_id === this.user_1) return "w";
+        if (this.user_id === this.user_2) return "b";
       },
     },
     mounted() {
@@ -152,7 +156,7 @@
                 headers: {
                 "Content-Type": "application/json",
                 },
-                body: JSON.stringify({game_id: this.game_id, row,col, user_id: this.user_id, opponent: this.whoIsOpponent}),
+                body: JSON.stringify({game_id: this.game_id, row,col, user_id: this.user_id, opponent: this.whoIsOpponent, playerColor: this.yourPlayerColor}),
             });
 
             const data = await res.json();

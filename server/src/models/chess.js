@@ -252,8 +252,6 @@ export class Chess {
         }
         const inCheck = this.isKingInCheck(color, king);
         const allMoves = this.getAllLegalMoves(color, king);
-        console.log("All Moves: ", allMoves);
-        console.log("In Check: ", inCheck);
         
         if (inCheck && allMoves.length === 0) return "checkmate";
         else if (!inCheck && allMoves.length === 0) return "draw";
@@ -369,7 +367,7 @@ export class Chess {
                 };
             }
         }else if(this.currentPiece.name === "rook" && this.currentPiece.moved === false){
-            console.log("rook move")
+            // console.log("rook move")
         }else {
             return false;
         }
@@ -379,6 +377,6 @@ export class Chess {
         if(piece.name === "pawn" && row === finalRow) {
             this.board[row][col] = new Queen(piece.color, {row: row, col: col});
             this.drawBoard();
-        }else console.log("Not a promotion")
+        }
     }
 }

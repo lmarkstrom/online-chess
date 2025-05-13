@@ -31,8 +31,7 @@ publicRouter.post("/login", async (req, res) => {
             console.log("Password is incorrect");
             return res.status(401).send(String(-1));
           }else {
-            model.createSession(username, id);
-            console.log("Session created" + model.sessions);
+            model.createSession(user.id, id);
             return res.cookie("session-id", id).send(String(user.id));
           }
         });
@@ -40,7 +39,7 @@ publicRouter.post("/login", async (req, res) => {
     });  
 });
 
-privateRouter.post("/logout", (req, res) => {
+publicRouter.post("/logout", (req, res) => {
     const { username } = req.body;
     model.removeSession(username);
     res.clearCookie("session-id").send("ok");
