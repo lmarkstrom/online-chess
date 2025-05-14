@@ -22,7 +22,7 @@ const app = express();
 const server = https.createServer(options, app);
 export const io = new Server(server);
 
-export const TIMEOUT = 5000;
+export const TIMEOUT = 30000;
 
 const { Theme } = betterLogging;
 betterLogging(console, {
