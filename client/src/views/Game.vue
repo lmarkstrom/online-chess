@@ -204,7 +204,7 @@
 </script>
 
 <style scoped>
-HTML, body {
+html, body {
     margin: 0;
     padding: 0;
 }
@@ -223,8 +223,9 @@ HTML, body {
   background-color: #f5f5f5;
   padding: 1rem;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  box-shadow: 0 0 15px rgb(0 0 0 / 20%);
 }
+
 #board {
   display: grid;
   grid-template: repeat(8, 1fr) / repeat(8, 1fr);
@@ -242,10 +243,13 @@ HTML, body {
   align-items: center;
   transition: background 0.2s;
 }
+
 .square:nth-child(odd) { background-color: #f0d9b5; }
+
 .square:nth-child(even){ background-color: #b58863; }
+
 .square.hoverable:hover {
-  background-color: rgba(0, 255, 0, 0.4);
+  background-color: rgb(0 255 0 / 40%);
   cursor: pointer;
 }
 
@@ -263,21 +267,24 @@ HTML, body {
   background: #fff;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  box-shadow: 0 0 10px rgb(0 0 0 /20%);
   width: 240px;
   max-height: 520px;
   overflow-y: auto;
 }
+
 #history h2 {
   margin-bottom: 1rem;
   font-size: 1.5rem;
   text-align: center;
 }
+
 #history-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
+
 #history-list li {
   padding: 0.5rem 0;
   border-bottom: 1px solid #ddd;
@@ -288,32 +295,36 @@ HTML, body {
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.75);
+  background: rgb(0 0 0 / 75%);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
+
 .overlay-content {
   background: #fff;
   padding: 2rem 3rem;
   border-radius: 10px;
   text-align: center;
-  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  box-shadow: 0 0 20px rgb(0 0 0 / 40%);
   font-size: 1.25rem;
   color: #333;
 }
+
 .top-info {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .info-content {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 }
+
 .top-info p {
   margin: 0 1rem;
 }
