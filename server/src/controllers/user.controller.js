@@ -37,7 +37,7 @@ publicRouter.post("/login", async (req, res) => {
             return res.status(401).send(String(-1));
           }
 
-          model.createSession(username, id);
+          model.createSession(row.id, id);
 
           return res.cookie("session-id", id).send(String(user.id));
         } catch (error) {

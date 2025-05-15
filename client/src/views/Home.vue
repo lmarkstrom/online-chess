@@ -131,7 +131,7 @@ export default {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user: this.userID }),
+        body: JSON.stringify({ userID: this.userID }),
       })
         .then((res) => res.json())
         .then((data) => {
