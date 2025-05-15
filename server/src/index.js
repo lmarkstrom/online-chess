@@ -9,13 +9,13 @@ import model from "./model.js";
 import userController from "./controllers/user.controller.js";
 import gameController from "./controllers/game.controller.js";
 import { requireAuth } from "./middleware/requireAuth.js";
-import https from 'https';
-import fs from 'fs';
+import https from "https";
+import fs from "fs";
 
 const options = {
-  key: fs.readFileSync('./certs/localhost-key.pem'),
-  cert: fs.readFileSync('./certs/localhost.pem'),
-}
+  key: fs.readFileSync("./certs/localhost-key.pem"),
+  cert: fs.readFileSync("./certs/localhost.pem"),
+};
 
 const port = 8989;
 const app = express();
@@ -40,7 +40,7 @@ app.use(
     header: { show: false },
     path: { show: true },
     body: { show: true },
-  })
+  }),
 );
 
 app.use(history());
@@ -58,7 +58,7 @@ io.use(
   socketIOSession(sessionConf, {
     autoSave: true,
     saveUninitialized: true,
-  })
+  }),
 );
 
 // Serve static files
@@ -104,7 +104,7 @@ io.on("connection", (socket) => {
     resetTimeout();
   });
 
-  socket.on("logIn", ({userID}) => {
+  socket.on("logIn", ({ userID }) => {
     console.log("User logged in:", userID);
     model.createSession(userID, sessionID);
     resetTimeout();

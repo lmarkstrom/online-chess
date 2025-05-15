@@ -60,7 +60,7 @@ privateRouter.post("/newGame", async (req, res) => {
       null,
       null,
       null,
-    ]
+    ],
   );
   await db.each("SELECT last_insert_rowid() AS id", (err, row) => {
     gameID = row.id;
@@ -77,7 +77,7 @@ privateRouter.post("/newGame", async (req, res) => {
     user1,
     null,
     boardString,
-    historyString
+    historyString,
   );
   model.broadcastGamelistUpdate(model.findGameById(gameID));
   console.log(`Game created${gameID}`);
@@ -85,31 +85,31 @@ privateRouter.post("/newGame", async (req, res) => {
 });
 
 publicRouter.post("/move", async (req, res) => {
-    const { row, col, gameID, userID, opponent, playerColor } = req.body;
-    const game = model.findGameById(gameID);
-    if(playerColor !== game.currentPlayer) {
-      return res.json({
-        board: game.board,
-        moveHistory: game.moveHistory,
-        currentPlayer: game.currentPlayer,
-      });
-    }
-    game.handleUserClick(row, col);
-    model.updateGame(game, gameID);
-    model.broadcastGameUpdate(game);  
-    const boardString = JSON.stringify(game.board);
-    const historyString = JSON.stringify(game.moveHistory);
-    const enpassantString = JSON.stringify(game.enpassant);
+  const { row, col, gameID, userID, opponent, playerColor } = req.body;
+  const game = model.findGameById(gameID);
+  if (playerColor !== game.currentPlayer) {
+    return res.json({
+      board: game.board,
+      moveHistory: game.moveHistory,
+      currentPlayer: game.currentPlayer,
+    });
+  }
+  game.handleUserClick(row, col);
+  model.updateGame(game, gameID);
+  model.broadcastGameUpdate(game);
+  const boardString = JSON.stringify(game.board);
+  const historyString = JSON.stringify(game.moveHistory);
+  const enpassantString = JSON.stringify(game.enpassant);
 
-    if(game.gameOver) {
-      model.broadcastWin(game.winner)
-    }
-    const gameWinner = null;
-    let winner = null;
-    if(game.winner !== null) {
-      winner = userID;
-      model.incrementUserStats(userID, game.winner, opponent);
-    }
+  if (game.gameOver) {
+    model.broadcastWin(game.winner);
+  }
+  const gameWinner = null;
+  let winner = null;
+  if (game.winner !== null) {
+    winner = userID;
+    model.incrementUserStats(userID, game.winner, opponent);
+  }
 
   await db.run(
     "UPDATE games SET gameBoard = ?, gameHistory = ?, currentPlayer = ?, winner = ?, checker = ?, enpassant = ? WHERE id = ?",
@@ -121,7 +121,7 @@ publicRouter.post("/move", async (req, res) => {
       game.check,
       enpassantString,
       gameID,
-    ]
+    ],
   );
   res.json({
     board: game.board,

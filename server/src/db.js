@@ -10,4 +10,3 @@ const db = await open({
 });
 
 export default db;
-

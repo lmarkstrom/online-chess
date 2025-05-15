@@ -80,7 +80,6 @@
 </template>
 
 <script>
-
 export default {
   name: "HomePage",
   components: {},
@@ -96,12 +95,12 @@ export default {
   computed: {
     openGames() {
       return this.open_games.filter(
-        (game) => game.user2 === null && game.user1 !== this.userID
+        (game) => game.user2 === null && game.user1 !== this.userID,
       );
     },
     myGames() {
       return this.open_games.filter(
-        (game) => game.user1 === this.userID || game.user2 === this.userID
+        (game) => game.user1 === this.userID || game.user2 === this.userID,
       );
     },
   },
@@ -163,7 +162,7 @@ export default {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          },
+        },
         body: JSON.stringify({
           user1: this.userID,
           username: this.username,
@@ -180,29 +179,29 @@ export default {
       push(`/game/${id}`);
     },
     emitUpdate() {
-        console.log("emitUpdate");
-        this.socket.emit("updateTime");
+      console.log("emitUpdate");
+      this.socket.emit("updateTime");
     },
     logout() {
-        const { commit } = this.$store;
-        const { push } = this.$router;
-        fetch("/home/logout", {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-            username: this.$store.getters.getUsername,
-            }),
-        }).then((response) => {
-            if (response.ok) {
-                commit("setAuthenticated", false);
-                console.log("Logout successful");
-                push("/login");
-            } else {
-                console.error("Logout failed");
-            }
-        })
+      const { commit } = this.$store;
+      const { push } = this.$router;
+      fetch("/home/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: this.$store.getters.getUsername,
+        }),
+      }).then((response) => {
+        if (response.ok) {
+          commit("setAuthenticated", false);
+          console.log("Logout successful");
+          push("/login");
+        } else {
+          console.error("Logout failed");
+        }
+      });
     },
     getStatus(game) {
       if (game.user2 === null) {

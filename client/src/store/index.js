@@ -46,8 +46,7 @@ export default createStore({
     },
     setSocket(state, socket) {
       state.socket = socket;
-    }
-
+    },
   },
   actions: {},
   modules: {},

@@ -61,7 +61,6 @@
 </template>
 
 <script>
-
 export default {
   name: "GameView",
   components: {},
@@ -259,7 +258,6 @@ body {
 .square:nth-child(even) {
   background-color: #b58863;
 }
-
 
 .square.hoverable:hover {
   background-color: rgb(0 255 0 / 40%);

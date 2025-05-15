@@ -32,19 +32,19 @@ class Model {
         row.currentPiece,
         row.winner,
         row.checker,
-        row.enpassant
+        row.enpassant,
       );
     });
     await db.each("SELECT * FROM sessions", (err, row) => {
-      this.sessions[row.id] = {userID: row.userID, time: row.time};
+      this.sessions[row.id] = { userID: row.userID, time: row.time };
     });
     this.clearSessions();
     const users = await db.all("SELECT id FROM users;", (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
+      if (err) reject(err);
+      else resolve(rows);
     });
     for (const user of users) {
-        const userID = user.id;
+      const userID = user.id;
 
       const stats = await db.get(
         `SELECT 
@@ -52,7 +52,7 @@ class Model {
                     SUM(CASE WHEN winner = ? THEN 1 ELSE 0 END) AS total_wins
                 FROM games
                 WHERE (user1 = ? OR user2 = ?) AND winner IS NOT NULL;`,
-        [userID, userID, userID]
+        [userID, userID, userID],
       );
       this.userStats[userID] = {
         totalGames: stats?.total_games || 0,
@@ -77,15 +77,19 @@ class Model {
     return null;
   }
   createSession(userID, id) {
-    this.sessions[id] = {userID, time: new Date()};
+    this.sessions[id] = { userID, time: new Date() };
     db.run("DELETE FROM sessions WHERE userID = ?", [userID]);
-    db.run("INSERT INTO sessions (userID, id, time) VALUES (?, ?, ?)", [userID, id, new Date()]);
+    db.run("INSERT INTO sessions (userID, id, time) VALUES (?, ?, ?)", [
+      userID,
+      id,
+      new Date(),
+    ]);
     return id;
   }
   clearSessions() {
     for (const id in this.sessions) {
-      if(!this.sessionActive(id)){
-          this.removeSession(id);
+      if (!this.sessionActive(id)) {
+        this.removeSession(id);
       } else console.log("Session active: " + id);
     }
   }
@@ -140,7 +144,7 @@ class Model {
       null,
       null,
       null,
-      null
+      null,
     );
   }
 

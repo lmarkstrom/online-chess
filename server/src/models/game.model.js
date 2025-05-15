@@ -1,7 +1,6 @@
 import { Chess, EnPassant } from "./chess.js";
 import { Pawn, Rook, Knight, Bishop, Queen, King } from "./piece.js";
 
-
 class Game extends Chess {
   constructor(
     id,
@@ -16,7 +15,7 @@ class Game extends Chess {
     currentPiece,
     winner,
     check,
-    enpassantText
+    enpassantText,
   ) {
     super();
     this.id = id;

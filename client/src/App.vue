@@ -35,9 +35,6 @@
 <script>
 // @ is an alias to /src
 import "bootstrap";
-import { io } from "socket.io-client";
-
-const socket = io("https://localhost:8989");
 
 export default {
   name: "App",
