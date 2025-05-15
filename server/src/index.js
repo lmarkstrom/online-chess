@@ -3,6 +3,7 @@ import express from "express";
 import expressSession from "express-session";
 import socketIOSession from "express-socket.io-session";
 import { Server } from "socket.io";
+import history from "connect-history-api-fallback";
 import { resolvePath } from "./util.js";
 import model from "./model.js";
 import userController from "./controllers/user.controller.js";
@@ -79,7 +80,6 @@ app.use("/game", requireAuth, gameController.privateRouter);
 
 // Initialize a model
 model.init(io);
-
 
 io.on("connection", (socket) => {
   const { session } = socket.handshake;

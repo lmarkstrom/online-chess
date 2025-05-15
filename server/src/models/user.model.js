@@ -1,7 +1,7 @@
-class User { 
-    constructor(id, username){
-      this.id = id;
-      this.username= username;
-    }
- }
- export default User;
+class User {
+  constructor(id, username) {
+    this.id = id;
+    this.username = username;
+  }
+}
+export default User;

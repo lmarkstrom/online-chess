@@ -4,8 +4,8 @@ export default createStore({
   state: {
     authenticated: false,
     username: "",
-    user_id: "",
-    game_id: null,
+    userID: "",
+    gameID: null,
     opponent: null,
     times: [],
     curAssistantTime: {},
@@ -19,13 +19,13 @@ export default createStore({
       return state.username;
     },
     getUserId(state) {
-      return state.user_id;
+      return state.userID;
     },
     getOpponent(state) {
       return state.opponent;
     },
     getGameId(state) {
-      return state.game_id;
+      return state.gameID;
     },
     getSocket(state) {
       return state.socket;
@@ -38,15 +38,16 @@ export default createStore({
     setUsername(state, username) {
       state.username = username;
     },
-    setUserId(state, user_id) {
-      state.user_id = user_id;
+    setUserId(state, userID) {
+      state.userID = userID;
     },
-    setGameId(state, game_id) {
-      state.game_id = game_id;
+    setGameId(state, gameID) {
+      state.gameID = gameID;
     },
     setSocket(state, socket) {
       state.socket = socket;
     }
+
   },
   actions: {},
   modules: {},

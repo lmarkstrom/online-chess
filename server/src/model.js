@@ -19,7 +19,21 @@ class Model {
       this.users[row.id] = new User(row.id, row.username);
     });
     await db.each("SELECT * FROM games WHERE winner IS NULL", (err, row) => {
-      this.games[row.id] = new Game(row.id, row.game_name, row.host, row.opponent, row.user_1, row.user_2, row.game_board, row.game_history, row.current_player, row.current_piece, row.winner, row.check_, row.enpassant);
+      this.games[row.id] = new Game(
+        row.id,
+        row.gameName,
+        row.host,
+        row.opponent,
+        row.user_1,
+        row.user_2,
+        row.gameBoard,
+        row.gameHistory,
+        row.current_player,
+        row.current_piece,
+        row.winner,
+        row.checker,
+        row.enpassant
+      );
     });
     await db.each("SELECT * FROM sessions", (err, row) => {
       this.sessions[row.id] = {user_id: row.user_id, time: row.time};
@@ -32,41 +46,40 @@ class Model {
     for (const user of users) {
         const userID = user.id;
 
-        const stats = await db.get(
-                `SELECT 
+      const stats = await db.get(
+        `SELECT 
                     COUNT(*) AS total_games,
                     SUM(CASE WHEN winner = ? THEN 1 ELSE 0 END) AS total_wins
                 FROM games
                 WHERE (user_1 = ? OR user_2 = ?) AND winner IS NOT NULL;`,
-                [userID, userID, userID],
-                (err, row) => {
-                    if (err) reject(err);
-                    else resolve(row);
-                }
-            );
-        this.userStats[userID] = {
-            totalGames: stats?.total_games || 0,
-            totalWins: stats?.total_wins || 0
-        };
+        [userID, userID, userID]
+      );
+      this.userStats[userID] = {
+        totalGames: stats?.total_games || 0,
+        totalWins: stats?.total_wins || 0,
+      };
     }
   }
   findGameById(id) {
     return this.games[id];
   }
+
   findUserById(id) {
     return this.users[id];
   }
+
   findUserByName(username) {
     for (const id in this.users) {
       if (this.users[id].username === username) {
         return this.users[id];
       }
     }
+    return null;
   }
-  createSession(user_id, id) {
-    this.sessions[id] = {user_id, time: new Date()};
-    db.run("DELETE FROM sessions WHERE user_id = ?", [user_id]);
-    db.run("INSERT INTO sessions (user_id, id, time) VALUES (?, ?, ?)", [user_id, id, new Date()]);
+  createSession(userID, id) {
+    this.sessions[id] = {userID, time: new Date()};
+    db.run("DELETE FROM sessions WHERE user_id = ?", [userID]);
+    db.run("INSERT INTO sessions (user_id, id, time) VALUES (?, ?, ?)", [userID, id, new Date()]);
     return id;
   }
   clearSessions() {
@@ -90,25 +103,45 @@ class Model {
     return false;
   }
 
-  removeSession(id) {
-    delete this.sessions[id];
-    db.run("DELETE FROM sessions WHERE id = ?", [id]);
+  removeSession(userID) {
+    delete this.sessions[userID];
+    db.run("DELETE FROM sessions WHERE id = ?", [userID]);
   }
-  getGamesForUser(user_id) {
+
+  getGamesForUser(userID) {
     const games = [];
     for (const id in this.games) {
-      if (this.games[id].user_1 === user_id || this.games[id].user_2 === user_id || this.games[id].user_2 === null) {
+      if (
+        this.games[id].user1 === userID ||
+        this.games[id].user2 === userID ||
+        this.games[id].user2 === null
+      ) {
         games.push(this.games[id]);
       }
     }
     return games;
   }
-  findSessionById(id){
+
+  findSessionById(id) {
     return this.sessions[id];
   }
 
-  createGame(id, game_name, host, user_1, user_2, game_board, game_history) {
-    this.games[id] = new Game(id, game_name, host, null, user_1, user_2, game_board, game_history, "w", null, null, null, null);
+  createGame(id, gameName, host, user1, user2, gameBoard, gameHistory) {
+    this.games[id] = new Game(
+      id,
+      gameName,
+      host,
+      null,
+      user1,
+      user2,
+      gameBoard,
+      gameHistory,
+      "w",
+      null,
+      null,
+      null,
+      null
+    );
   }
 
   updateGame(game, id) {
@@ -119,7 +152,7 @@ class Model {
     this.users[id] = new User(id, username);
   }
 
-  getWinRatio(userID) { 
+  getWinRatio(userID) {
     const user = this.userStats[userID];
     if (user) {
       if (user.totalGames === 0) return 1;
@@ -131,15 +164,15 @@ class Model {
 
   incrementUserStats(userID, winner, opponent) {
     if (this.userStats[userID]) {
-      this.userStats[userID].totalGames++;
+      this.userStats[userID].totalGames += 1;
       if (userID === winner) {
-        this.userStats[userID].totalWins++;
+        this.userStats[userID].totalWins += 1;
       }
     }
     if (this.userStats[opponent]) {
-      this.userStats[opponent].totalGames++;
+      this.userStats[opponent].totalGames += 1;
       if (opponent === winner) {
-        this.userStats[opponent].totalWins++;
+        this.userStats[opponent].totalWins += 1;
       }
     }
   }
@@ -147,17 +180,21 @@ class Model {
   removeGame(id) {
     delete this.games[id];
   }
+
   broadcastGamelistUpdate(game) {
     this.io.emit("gamelistUpdate", game);
   }
+
   broadcastGameUpdate(game) {
     this.io.emit("gameUpdate", game);
   }
-  broadcastBooked(id, student){
-    this.io.emit("booked", {id, student});
+
+  broadcastBooked(id, student) {
+    this.io.emit("booked", { id, student });
   }
+
   broadcastWin(winner) {
-    this.io.emit("gameOver", {winner});
+    this.io.emit("gameOver", { winner });
   }
 
   /**

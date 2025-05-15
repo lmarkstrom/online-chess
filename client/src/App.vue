@@ -14,12 +14,14 @@
           <a class="nav-link" href="#" @click="redirect('/login')">Login</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" @click="redirect('/register')">Register</a>
+          <a class="nav-link" href="#" @click="redirect('/register')"
+            >Register</a
+          >
         </li>
         <li v-if="isAuthenticated" class="nav-item">
           <a class="nav-link" href="#" @click="logout()">Logout</a>
         </li>
-        <li v-if="isAuthenticated"  class="nav-item">
+        <li v-if="isAuthenticated" class="nav-item">
           <a class="nav-link" href="#" @click="redirect('/home')">Home</a>
         </li>
       </ul>
@@ -70,15 +72,14 @@ export default {
         body: JSON.stringify({
           username: this.$store.getters.getUsername,
         }),
-      })
-        .then((response) => {
-          if (response.ok) {
-            commit("setAuthenticated", false);
-            push("/login");
-          } else {
-            console.error("Logout failed");
-          }
-        })
+      }).then((response) => {
+        if (response.ok) {
+          commit("setAuthenticated", false);
+          push("/login");
+        } else {
+          console.error("Logout failed");
+        }
+      });
     },
   },
 };
@@ -93,6 +94,7 @@ body {
   background-color: #eae9ee;
   padding-top: 35px;
 }
+
 .custom-nav {
   z-index: 2000;
 }
