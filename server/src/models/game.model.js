@@ -35,11 +35,11 @@ class Game extends Chess {
       : new EnPassant();
   }
 
-  static parseString(text) {
+  parseString(text) {
     try {
       return JSON.parse(text);
     } catch (e) {
-      return null;
+      return [];
     }
   }
 
@@ -54,7 +54,7 @@ class Game extends Chess {
     }
   }
 
-  static buildBoard(board) {
+  buildBoard(board) {
     const newBoard = [];
     for (let i = 0; i < board.length; i += 1) {
       newBoard[i] = [];

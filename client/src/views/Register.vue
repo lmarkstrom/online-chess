@@ -56,7 +56,7 @@ export default {
       if (
         !(regex.test(this.form.password) && regex.test(this.form.passwordcheck))
       ) {
-        alert("Password does not match regex lol")
+        alert("Password does not match regex lol");
         return;
       }
 

@@ -12,7 +12,6 @@ import userController from "./controllers/user.controller.js";
 import gameController from "./controllers/game.controller.js";
 import requireAuth from "./middleware/requireAuth.js";
 
-
 const options = {
   key: fs.readFileSync("./certs/localhost-key.pem"),
   cert: fs.readFileSync("./certs/localhost.pem"),

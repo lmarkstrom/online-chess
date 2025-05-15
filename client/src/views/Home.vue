@@ -95,12 +95,12 @@ export default {
   computed: {
     openGames() {
       return this.open_games.filter(
-        (game) => game.user2 === null && game.user1 !== this.userID,
+        (game) => game.user2 === null && game.user1 !== this.userID
       );
     },
     myGames() {
       return this.open_games.filter(
-        (game) => game.user1 === this.userID || game.user2 === this.userID,
+        (game) => game.user1 === this.userID || game.user2 === this.userID
       );
     },
   },

@@ -59,6 +59,7 @@ class Model {
       };
     }
   }
+
   findGameById(id) {
     return this.games[id];
   }
@@ -75,23 +76,25 @@ class Model {
     }
     return null;
   }
+
   createSession(userID, id) {
     this.sessions[id] = { userID, time: new Date() };
     db.run("DELETE FROM sessions WHERE userID = ?", [userID]);
-    db.run("INSERT INTO sessions (userID, id, time) VALUES (?, ?, ?)", [
-      userID,
-      id,
-      new Date(),
-    ]);
+    db.run(
+      "INSERT OR REPLACE INTO sessions (userID, id, time) VALUES (?, ?, ?)",
+      [userID, id, new Date()]
+    );
     return id;
   }
+
   clearSessions() {
     for (const id in this.sessions) {
       if (!this.sessionActive(id)) {
         this.removeSession(id);
-      } else console.log("Session active: " + id);
+      } else console.log(`Session active: ${id}`);
     }
   }
+
   sessionActive(id) {
     if (this.sessions[id]) {
       const session = this.sessions[id];

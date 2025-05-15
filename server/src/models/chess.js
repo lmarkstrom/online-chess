@@ -66,6 +66,7 @@ export class Chess {
   setSquareActive(row, col, piece) {
     this.currentPiece = piece;
   }
+
   setSquareInactive() {
     this.currentPiece = null;
   }
@@ -100,30 +101,27 @@ export class Chess {
         if (this.board[row][col].color !== this.currentPlayer) {
           // alert("You can only move your own pieces!");
           return;
-        } else if (this.checkCastling(row, col)) {
+        }
+        if (this.checkCastling(row, col)) {
           this.setSquareInactive(row, col, this.board[row][col]);
           return;
         }
       } else return;
       this.setSquareActive(row, col, this.board[row][col]);
-    } else {
-      if (this.board[row][col] !== null) {
-        if (this.board[row][col].color !== this.currentPlayer) {
-          if (this.currentPiece.canAttack(this.board, { row: row, col: col })) {
-            this.attack(this.board[row][col]);
-          }
-        } else {
-          this.checkCastling(row, col);
+    } else if (this.board[row][col] !== null) {
+      if (this.board[row][col].color !== this.currentPlayer) {
+        if (this.currentPiece.canAttack(this.board, { row, col })) {
+          this.attack(this.board[row][col]);
         }
-      } else if (this.enPassantAttack(row, col)) {
-        this.attackEnPassant(row, col);
       } else {
-        if (this.currentPiece.canMove(this.board, { row: row, col: col })) {
-          this.move(row, col);
-        } else {
-          // alert("Invalid move!");
-        }
+        this.checkCastling(row, col);
       }
+    } else if (this.enPassantAttack(row, col)) {
+      this.attackEnPassant(row, col);
+    } else if (this.currentPiece.canMove(this.board, { row, col })) {
+      this.move(row, col);
+    } else {
+      // alert("Invalid move!");
     }
     if (this.gameOver) {
       return this.winner;
@@ -141,7 +139,7 @@ export class Chess {
   }
 
   checkGameOver() {
-    let color = this.currentPlayer === "w" ? "b" : "w";
+    const color = this.currentPlayer === "w" ? "b" : "w";
     const res = this.checkCheckmate(color);
     console.log(res);
     if (res === "checkmate") {
@@ -159,6 +157,7 @@ export class Chess {
       console.log("Check!");
     }
   }
+
   isKingInCheck(color, king) {
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
@@ -176,8 +175,9 @@ export class Chess {
       }
     }
   }
+
   getAllLegalMoves(color, king) {
-    let moves = [];
+    const moves = [];
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         if (this.board[i][j] !== null && this.board[i][j].color === color) {
@@ -187,10 +187,10 @@ export class Chess {
                 this.board[k][l] === null &&
                 this.board[i][j].canMove(this.board, { row: k, col: l })
               ) {
-                let tmp1 = this.board[i][j];
-                let tmp2 = this.board[k][l];
-                let oldRow = this.board[i][j].row;
-                let oldCol = this.board[i][j].col;
+                const tmp1 = this.board[i][j];
+                const tmp2 = this.board[k][l];
+                const oldRow = this.board[i][j].row;
+                const oldCol = this.board[i][j].col;
 
                 this.board[k][l] = this.board[i][j];
                 this.board[i][j] = null;
@@ -199,14 +199,7 @@ export class Chess {
 
                 if (!this.isKingInCheck(color, king)) {
                   console.log(
-                    "Piece on squate: " +
-                      i +
-                      ", " +
-                      j +
-                      " can move to: " +
-                      k +
-                      ", " +
-                      l
+                    `Piece on squate: ${i}, ${j} can move to: ${k}, ${l}`
                   );
                   moves.push({ row: k, col: l });
                 }
@@ -220,10 +213,10 @@ export class Chess {
                 this.board[k][l].color !== color &&
                 this.board[i][j].canAttack(this.board, { row: k, col: l })
               ) {
-                let tmp1 = this.board[i][j];
-                let tmp2 = this.board[k][l];
-                let oldRow = this.board[i][j].row;
-                let oldCol = this.board[i][j].col;
+                const tmp1 = this.board[i][j];
+                const tmp2 = this.board[k][l];
+                const oldRow = this.board[i][j].row;
+                const oldCol = this.board[i][j].col;
 
                 this.board[k][l] = this.board[i][j];
                 this.board[i][j] = null;
@@ -232,14 +225,7 @@ export class Chess {
 
                 if (!this.isKingInCheck(color, king)) {
                   console.log(
-                    "Piece on squate: " +
-                      i +
-                      ", " +
-                      j +
-                      " can attack: " +
-                      k +
-                      ", " +
-                      l
+                    `Piece on squate: ${i}, ${j} can attack: ${k}, ${l}`
                   );
                   moves.push({ row: k, col: l });
                 }
@@ -255,6 +241,7 @@ export class Chess {
     }
     return moves;
   }
+
   checkCheckmate(color) {
     console.log("Checking game over for", color, "king.");
     let king = null;
@@ -275,16 +262,17 @@ export class Chess {
     console.log(allMoves);
 
     if (inCheck && allMoves.length === 0) return "checkmate";
-    else if (!inCheck && allMoves.length === 0) return "draw";
-    else if (inCheck) return "check";
+    if (!inCheck && allMoves.length === 0) return "draw";
+    if (inCheck) return "check";
     return "noCheckmate";
   }
 
   move(row, col) {
-    let tmp1 = this.currentPiece;
-    let tmp2 = this.board[row][col];
-    let oldRow = this.currentPiece.row;
-    let oldCol = this.currentPiece.col;
+    console.log("Moving to", row, col);
+    const tmp1 = this.currentPiece;
+    const tmp2 = this.board[row][col];
+    const oldRow = this.currentPiece.row;
+    const oldCol = this.currentPiece.col;
 
     this.board[row][col] = this.currentPiece;
     this.board[this.currentPiece.row][this.currentPiece.col] = null;
@@ -299,11 +287,12 @@ export class Chess {
       tmp1.row = oldRow;
       tmp1.col = oldCol;
       return;
-    } else console.log("Valid move!");
+    }
+    console.log("Valid move!");
     this.checkEnPassant(row, col);
     this.currentPiece.row = row;
     this.currentPiece.col = col;
-    let oldPiece = this.currentPiece;
+    const oldPiece = this.currentPiece;
     this.setSquareInactive();
     this.addPosToHistory(row, col);
     this.checkGameOver();
@@ -311,11 +300,12 @@ export class Chess {
     this.updateCastleMove(oldPiece);
     this.promotion(row, col, oldPiece);
   }
+
   attack(target) {
-    let tmp1 = this.currentPiece;
-    let tmp2 = this.board[target.row][target.col];
-    let oldRow = this.currentPiece.row;
-    let oldCol = this.currentPiece.col;
+    const tmp1 = this.currentPiece;
+    const tmp2 = this.board[target.row][target.col];
+    const oldRow = this.currentPiece.row;
+    const oldCol = this.currentPiece.col;
 
     this.board[target.row][target.col] = this.currentPiece;
     this.board[this.currentPiece.row][this.currentPiece.col] = null;
@@ -331,10 +321,11 @@ export class Chess {
       tmp1.row = oldRow;
       tmp1.col = oldCol;
       return;
-    } else console.log("Valid move!");
+    }
+    console.log("Valid move!");
     this.currentPiece.row = target.row;
     this.currentPiece.col = target.col;
-    let oldPiece = this.currentPiece;
+    const oldPiece = this.currentPiece;
     this.setSquareInactive();
     this.addPosToHistory(target.row, target.col);
     this.checkGameOver();
@@ -343,11 +334,11 @@ export class Chess {
   }
 
   attackEnPassant(row, col) {
-    let dir = this.currentPiece.color === "w" ? -1 : 1;
-    let tmp1 = this.currentPiece;
-    let tmp2 = this.board[row][col];
-    let oldRow = this.currentPiece.row;
-    let oldCol = this.currentPiece.col;
+    const dir = this.currentPiece.color === "w" ? -1 : 1;
+    const tmp1 = this.currentPiece;
+    const tmp2 = this.board[row][col];
+    const oldRow = this.currentPiece.row;
+    const oldCol = this.currentPiece.col;
 
     this.board[row][col] = this.currentPiece;
     this.board[this.currentPiece.row][this.currentPiece.col] = null;
@@ -360,7 +351,8 @@ export class Chess {
       this.board[target.row][target.col] = tmp2;
 
       return;
-    } else console.log("Valid move!");
+    }
+    console.log("Valid move!");
     this.currentPiece.row = row;
     this.currentPiece.col = col;
     this.setSquareInactive();
@@ -374,9 +366,9 @@ export class Chess {
       this.currentPiece.name === "pawn" &&
       Math.abs(this.currentPiece.row - row) === 2
     ) {
-      let dir = this.currentPiece.color === "w" ? -1 : 1;
+      const dir = this.currentPiece.color === "w" ? -1 : 1;
       this.enPassant.color = this.currentPiece.color;
-      this.enPassant.pos = { row: row - dir, col: col };
+      this.enPassant.pos = { row: row - dir, col };
       this.enPassant.move = this.moveHistory.length;
     }
   }
@@ -393,9 +385,12 @@ export class Chess {
         this.enPassant.color !== this.currentPiece.color
       ) {
         return true;
-      } else return false;
-    } else return false;
+      }
+      return false;
+    }
+    return false;
   }
+
   checkCastling(row, col) {
     if (this.currentPiece === null) return false;
     let dir = col - this.currentPiece.col;
@@ -414,15 +409,14 @@ export class Chess {
           this.board[this.currentPiece.row][this.currentPiece.col + dir] ===
             null
         ) {
-          let rookDist = Math.abs(this.currentPiece.col - col) - 1;
+          const rookDist = Math.abs(this.currentPiece.col - col) - 1;
           this.move(row, this.currentPiece.col + dir * 2);
           this.currentPiece = this.board[row][col];
           this.move(row, col - dir * rookDist);
           return true;
-        } else {
-          // alert("Invalid move!")
-          console.log("Invalid move!");
         }
+        // alert("Invalid move!")
+        console.log("Invalid move!");
       }
     } else if (
       this.currentPiece.name === "rook" &&
@@ -433,10 +427,11 @@ export class Chess {
       return false;
     }
   }
+
   promotion(row, col, piece) {
-    let finalRow = piece.color === "w" ? 0 : 7;
+    const finalRow = piece.color === "w" ? 0 : 7;
     if (piece.name === "pawn" && row === finalRow) {
-      this.board[row][col] = new Queen(piece.color, { row: row, col: col });
+      this.board[row][col] = new Queen(piece.color, { row, col });
       // this.drawBoard();
     }
   }

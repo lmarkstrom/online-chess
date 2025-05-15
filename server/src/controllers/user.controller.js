@@ -90,8 +90,8 @@ publicRouter.post("/register", async (req, res) => {
     });
   } catch (error) {
     console.error("Error during registration", error);
+    return res.status(401).send(String(-1));
   }
-  return res.status(401).send(String(-1));
 });
 
 export default { publicRouter, privateRouter };

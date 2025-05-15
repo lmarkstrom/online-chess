@@ -96,6 +96,10 @@ export default {
       if (this.userID === this.user2) return this.user1;
       return "Unknown";
     },
+    yourPlayerColor() {
+      if (this.userID === this.user1) return "w";
+      if (this.userID === this.user2) return "b";
+    },
   },
   mounted() {
     const { getters } = this.$store;
