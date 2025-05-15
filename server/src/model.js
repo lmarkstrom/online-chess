@@ -1,6 +1,8 @@
 import User from "./models/user.model.js";
 import Game from "./models/game.model.js";
 import db from "./db.js";
+import { TIMEOUT } from "./index.js";
+import session from "express-session";
 
 class Model {
   constructor() {
@@ -18,20 +20,17 @@ class Model {
     });
     await db.each("SELECT * FROM games WHERE winner IS NULL", (err, row) => {
       this.games[row.id] = new Game(row.id, row.game_name, row.host, row.opponent, row.user_1, row.user_2, row.game_board, row.game_history, row.current_player, row.current_piece, row.winner, row.check_, row.enpassant);
-      console.log(this.games[row.id]);
     });
-    const users = await  
-    db.all("SELECT DISTINCT user_1 AS user_id FROM games UNION SELECT DISTINCT user_2 FROM games;", (err, rows) => {
+    await db.each("SELECT * FROM sessions", (err, row) => {
+      this.sessions[row.id] = {user_id: row.user_id, time: row.time};
+    });
+    this.clearSessions();
+    const users = await db.all("SELECT id FROM users;", (err, rows) => {
         if (err) reject(err);
         else resolve(rows);
     });
-    
-
-    console.log("Users:", users);
-
-    // Iterate over each user and fetch their stats
     for (const user of users) {
-        const userID = user.user_id;
+        const userID = user.id;
 
         const stats = await db.get(
                 `SELECT 
@@ -50,11 +49,8 @@ class Model {
             totalWins: stats?.total_wins || 0
         };
     }
-    console.log("User stats " + JSON.stringify(this.userStats));
   }
-
   findGameById(id) {
-    console.log(this.games[id]);
     return this.games[id];
   }
   findUserById(id) {
@@ -69,16 +65,34 @@ class Model {
   }
   createSession(user_id, id) {
     this.sessions[id] = {user_id, time: new Date()};
+    db.run("DELETE FROM sessions WHERE user_id = ?", [user_id]);
+    db.run("INSERT INTO sessions (user_id, id, time) VALUES (?, ?, ?)", [user_id, id, new Date()]);
     return id;
   }
-
-  removeSession(user_id) {
+  clearSessions() {
     for (const id in this.sessions) {
-      if (this.sessions[id].user_id === user_id) {
-        delete this.sessions[id];
-        return;
-      }
+      if(!this.sessionActive(id)){
+          this.removeSession(id);
+      } else console.log("Session active: " + id);
     }
+  }
+  sessionActive(id) {
+    if (this.sessions[id]) {
+      const session = this.sessions[id];
+      const now = new Date();
+      const diff = Math.abs(now - session.time);
+      if (diff > TIMEOUT) {
+        this.removeSession(id);
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  removeSession(id) {
+    delete this.sessions[id];
+    db.run("DELETE FROM sessions WHERE id = ?", [id]);
   }
   getGamesForUser(user_id) {
     const games = [];
@@ -108,9 +122,7 @@ class Model {
   getWinRatio(userID) { 
     const user = this.userStats[userID];
     if (user) {
-      console.log("Total games: " + user.totalGames);
-      console.log("Total wins: " + user.totalWins);
-      console.log("Win ratio: " + user.totalWins / user.totalGames);
+      if (user.totalGames === 0) return 1;
       return user.totalWins / user.totalGames;
     }
     console.log("User not found");
@@ -130,7 +142,6 @@ class Model {
         this.userStats[opponent].totalWins++;
       }
     }
-    console.log("User stats updated for " + userID);
   }
 
   removeGame(id) {
@@ -146,7 +157,6 @@ class Model {
     this.io.emit("booked", {id, student});
   }
   broadcastWin(winner) {
-    console.log("Broadcasting win: " + winner);
     this.io.emit("gameOver", {winner});
   }
 

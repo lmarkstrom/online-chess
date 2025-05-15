@@ -2,7 +2,6 @@ import betterLogging from "better-logging";
 import express from "express";
 import expressSession from "express-session";
 import socketIOSession from "express-socket.io-session";
-import { createServer } from "http";
 import { Server } from "socket.io";
 import { resolvePath } from "./util.js";
 import model from "./model.js";
@@ -21,9 +20,9 @@ const options = {
 const port = 8989;
 const app = express();
 const server = https.createServer(options, app);
-const io = new Server(server);
+export const io = new Server(server);
 
-// export const game = new Chess();
+export const TIMEOUT = 30000;
 
 const { Theme } = betterLogging;
 betterLogging(console, {
@@ -72,6 +71,8 @@ app.use(express.urlencoded({ extended: true }));
 // Controllers
 app.use(userController.publicRouter);
 app.use(gameController.publicRouter);
+app.use("/game", userController.publicRouter);
+app.use("/home", userController.publicRouter);
 app.use("/home", requireAuth, userController.privateRouter);
 app.use("/home", requireAuth, gameController.privateRouter);
 app.use("/game", requireAuth, gameController.privateRouter);
@@ -82,22 +83,31 @@ model.init(io);
 
 io.on("connection", (socket) => {
   const { session } = socket.handshake;
+  const sessionID = session.id;
   let timeout;
 
-  console.log("New socket connection");
+  console.log("New socket connection for session:", sessionID);
 
   const resetTimeout = () => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       socket.emit("sessionTimeout");
-    }, 100000);
+      console.log("Session timed out:", sessionID);
+      model.removeSession(sessionID);
+      // socket.disconnect(true);
+    }, TIMEOUT);
   };
 
   resetTimeout();
 
   socket.on("updateTime", () => {
     console.log("Session updated");
-    session.time = new Date();
+    resetTimeout();
+  });
+
+  socket.on("logIn", ({user_id}) => {
+    console.log("User logged in:", user_id);
+    model.createSession(user_id, sessionID);
     resetTimeout();
   });
 
@@ -107,5 +117,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(port, () => {
-  console.log(`Listening on http://localhost:${port}/`);
+  console.log(`Listening on https://localhost:${port}/`);
 });

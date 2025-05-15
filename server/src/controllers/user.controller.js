@@ -2,6 +2,7 @@ import { Router } from "express";
 import model from "../model.js";
 import db from "../db.js";
 import pkg from "bcrypt";
+import { io } from "../index.js";
 const bcrypt = pkg;
 
 const publicRouter = Router();
@@ -31,8 +32,7 @@ publicRouter.post("/login", async (req, res) => {
             console.log("Password is incorrect");
             return res.status(401).send(String(-1));
           }else {
-            model.createSession(username, id);
-            console.log("Session created" + model.sessions);
+            model.createSession(user.id, id);
             return res.cookie("session-id", id).send(String(user.id));
           }
         });
@@ -40,9 +40,15 @@ publicRouter.post("/login", async (req, res) => {
     });  
 });
 
-privateRouter.post("/logout", (req, res) => {
-    const { username } = req.body;
-    model.removeSession(username);
+publicRouter.post("/logout", async (req, res) => {
+    const { id } = req.session;
+    model.removeSession(id);
+    const socket = await io.fetchSockets();
+    for (const s of socket) {
+        if (s.handshake?.session?.id === id) {
+            s.disconnect(true);
+        }
+    }
     res.clearCookie("session-id").send("ok");
 });
 
@@ -60,9 +66,10 @@ publicRouter.post("/register", async (req, res) => {
       const statement = await db.prepare("INSERT INTO users (username, password) VALUES (?, ?)");
       statement.run(username, hash);
       statement.finalize();
-      model.addUser(id, username);
-      model.createSession(username, id);
-      return res.cookie("session-id", id).json({ success: true, userId: id, username });
+      const userRes = await db.get("SELECT * FROM users WHERE username = ?", [username]);
+      model.addUser(userRes.id, username);
+      model.createSession(userRes.id, id);
+      return res.cookie("session-id", id).json({ success: true, userId: userRes, username });
     });
 });
 
