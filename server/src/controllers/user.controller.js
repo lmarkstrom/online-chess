@@ -1,8 +1,8 @@
 import { Router } from "express";
 import pkg from "bcrypt";
-import model from "../model.js";
 import db from "../db.js";
-import { io } from "../index.js";
+import { io, model } from "../index.js";
+
 const bcrypt = pkg;
 
 const publicRouter = Router();
@@ -35,13 +35,9 @@ publicRouter.post("/login", async (req, res) => {
           if (!result) {
             console.log("Password is incorrect");
             return res.status(401).send(String(-1));
-          } else {
-            model.createSession(user.id, id);
-            return res.cookie("session-id", id).send(String(user.id));
           }
 
           model.createSession(username, id);
-          console.log(`Session created${model.sessions}`);
 
           return res.cookie("session-id", id).send(String(user.id));
         } catch (error) {
@@ -94,8 +90,8 @@ publicRouter.post("/register", async (req, res) => {
     });
   } catch (error) {
     console.error("Error during registration", error);
-    return res.status(401).send(String(-1));
   }
+  return res.status(401).send(String(-1));
 });
 
 export default { publicRouter, privateRouter };

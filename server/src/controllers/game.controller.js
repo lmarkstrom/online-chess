@@ -1,5 +1,5 @@
 import { Router } from "express";
-import model from "../model.js";
+import { model } from "../index.js";
 import { Chess } from "../models/chess.js";
 import db from "../db.js";
 
@@ -104,7 +104,7 @@ publicRouter.post("/move", async (req, res) => {
   if (game.gameOver) {
     model.broadcastWin(game.winner);
   }
-  const gameWinner = null;
+  // const gameWinner = null;
   let winner = null;
   if (game.winner !== null) {
     winner = userID;
@@ -123,7 +123,7 @@ publicRouter.post("/move", async (req, res) => {
       gameID,
     ],
   );
-  res.json({
+  return res.json({
     board: game.board,
     moveHistory: game.moveHistory,
     currentPlayer: game.currentPlayer,

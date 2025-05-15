@@ -80,6 +80,8 @@ app.use("/game", requireAuth, gameController.privateRouter);
 // Initialize a model
 model.init(io);
 
+export { model };
+
 io.on("connection", (socket) => {
   const { session } = socket.handshake;
   const sessionID = session.id;
