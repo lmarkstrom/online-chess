@@ -1,8 +1,6 @@
-import e from "express";
 import { Pawn, Rook, Knight, Bishop, Queen, King } from "./piece.js";
 
 // const boardHolder = document.getElementById("board");
-const boardHolder = null;
 
 export class EnPassant {
   constructor() {
@@ -29,9 +27,9 @@ export class Chess {
   }
 
   placePieces() {
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 8; i += 1) {
       this.board[i] = [];
-      for (let j = 0; j < 8; j++) {
+      for (let j = 0; j < 8; j += 1) {
         if (i === 1) this.board[i][j] = new Pawn("b", { row: i, col: j });
         else if (i === 6) this.board[i][j] = new Pawn("w", { row: i, col: j });
         else if (i === 0) {
@@ -77,17 +75,6 @@ export class Chess {
     const to = files[col] + (8 - row);
     const move = `${from} → ${to}`;
     this.moveHistory.push(move);
-    this.drawHistory();
-  }
-
-  drawHistory() {
-    // const historyEl = document.getElementById("history-list");
-    // historyEl.innerHTML = "";
-    // this.moveHistory.forEach((move, index) => {
-    //     const li = document.createElement("li");
-    //     li.textContent = `${index + 1}. ${move}`;
-    //     historyEl.appendChild(li);
-    // });
   }
 
   handleUserClick(row, col) {
@@ -123,19 +110,18 @@ export class Chess {
     } else {
       // alert("Invalid move!");
     }
-    if (this.gameOver) {
-      return this.winner;
-    }
   }
 
   userMove() {
     this.currentPlayer = this.currentPlayer === "w" ? "b" : "w";
   }
 
-  updateCastleMove(piece) {
-    if (piece.name === "king" || piece.name === "rook") {
-      piece.moved = true;
+  static updateCastleMove(piece) {
+    const updatedPiece = { ...piece };
+    if (updatedPiece.name === "king" || updatedPiece.name === "rook") {
+      updatedPiece.moved = true;
     }
+    return updatedPiece;
   }
 
   checkGameOver() {
@@ -159,8 +145,8 @@ export class Chess {
   }
 
   isKingInCheck(color, king) {
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
+    for (let i = 0; i < 8; i += 1) {
+      for (let j = 0; j < 8; j += 1) {
         if (this.board[i][j] !== null && this.board[i][j].color !== color) {
           if (
             this.board[i][j].canAttack(this.board, {
@@ -174,15 +160,16 @@ export class Chess {
         }
       }
     }
+    return false;
   }
 
   getAllLegalMoves(color, king) {
     const moves = [];
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
+    for (let i = 0; i < 8; i += 1) {
+      for (let j = 0; j < 8; j += 1) {
         if (this.board[i][j] !== null && this.board[i][j].color === color) {
-          for (let k = 0; k < 8; k++) {
-            for (let l = 0; l < 8; l++) {
+          for (let k = 0; k < 8; k += 1) {
+            for (let l = 0; l < 8; l += 1) {
               if (
                 this.board[k][l] === null &&
                 this.board[i][j].canMove(this.board, { row: k, col: l })
@@ -245,8 +232,8 @@ export class Chess {
   checkCheckmate(color) {
     console.log("Checking game over for", color, "king.");
     let king = null;
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
+    for (let i = 0; i < 8; i += 1) {
+      for (let j = 0; j < 8; j += 1) {
         if (
           this.board[i][j] !== null &&
           this.board[i][j].name === "king" &&
@@ -292,12 +279,12 @@ export class Chess {
     this.checkEnPassant(row, col);
     this.currentPiece.row = row;
     this.currentPiece.col = col;
-    const oldPiece = this.currentPiece;
+    let oldPiece = this.currentPiece;
     this.setSquareInactive();
     this.addPosToHistory(row, col);
     this.checkGameOver();
     this.userMove();
-    this.updateCastleMove(oldPiece);
+    oldPiece = Chess.updateCastleMove(oldPiece);
     this.promotion(row, col, oldPiece);
   }
 
@@ -426,6 +413,7 @@ export class Chess {
     } else {
       return false;
     }
+    return false;
   }
 
   promotion(row, col, piece) {

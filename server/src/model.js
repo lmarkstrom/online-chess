@@ -1,7 +1,6 @@
 import User from "./models/user.model.js";
 import Game from "./models/game.model.js";
 import db from "./db.js";
-import { TIMEOUT } from "./index.js";
 
 class Model {
   constructor() {
@@ -10,10 +9,12 @@ class Model {
     this.sessions = {};
     this.userStats = {};
     this.io = undefined;
+    this.TIMEOUT = 0;
   }
 
-  async init(io) {
+  async init(io, timeout) {
     this.io = io;
+    this.TIMEOUT = timeout;
     await db.each("SELECT * FROM users", (err, row) => {
       this.users[row.id] = new User(row.id, row.username);
     });
@@ -37,11 +38,8 @@ class Model {
     await db.each("SELECT * FROM sessions", (err, row) => {
       this.sessions[row.id] = { userID: row.userID, time: row.time };
     });
-    this.clearSessions();
-    const users = await db.all("SELECT id FROM users;", (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
+    this.clearSessions(this.TIMEOUT);
+    const users = await db.all("SELECT id FROM users;");
     for (const user of users) {
       const userID = user.id;
 
@@ -87,15 +85,15 @@ class Model {
     return id;
   }
 
-  clearSessions() {
+  clearSessions(TIMEOUT) {
     for (const id in this.sessions) {
-      if (!this.sessionActive(id)) {
+      if (!this.sessionActive(id, TIMEOUT)) {
         this.removeSession(id);
       } else console.log(`Session active: ${id}`);
     }
   }
 
-  sessionActive(id) {
+  sessionActive(id, TIMEOUT) {
     if (this.sessions[id]) {
       const session = this.sessions[id];
       const now = new Date();

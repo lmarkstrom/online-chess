@@ -45,7 +45,7 @@ export default {
       const regex = /^(?=.*[A-Za-z])(?=.*\d).{3,}$/;
       if (!regex.test(this.password)) {
         // && regex.test(this.username)
-        this.msg = "Bad credentials!";
+        console.error("Bad credentials!");
         return;
       }
       const { commit, getters } = this.$store;
@@ -70,7 +70,7 @@ export default {
             commit("setSocket", socket);
             socket.emit("logIn", { userID: data });
           } else {
-            this.msg = "Bad credentials!";
+            console.error("Bad credentials!");
           }
         });
       push(getters.isAuthenticated === true ? "/home" : "/login");

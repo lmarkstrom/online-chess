@@ -99,6 +99,7 @@ export default {
     yourPlayerColor() {
       if (this.userID === this.user1) return "w";
       if (this.userID === this.user2) return "b";
+      return "Unknown";
     },
   },
   mounted() {
