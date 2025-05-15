@@ -66,9 +66,9 @@ export default {
             const socket = io("https://localhost:8989");
             commit("setAuthenticated", true);
             commit("setUsername", this.username);
-            commit("setUserId", data);
+            commit("setUserID", data);
             commit("setSocket", socket);
-            socket.emit("logIn", { user_id: data });
+            socket.emit("logIn", { userID: data });
           } else {
             this.msg = "Bad credentials!";
           }

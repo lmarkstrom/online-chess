@@ -18,13 +18,13 @@ export default createStore({
     getUsername(state) {
       return state.username;
     },
-    getUserId(state) {
+    getUserID(state) {
       return state.userID;
     },
     getOpponent(state) {
       return state.opponent;
     },
-    getGameId(state) {
+    getGameID(state) {
       return state.gameID;
     },
     getSocket(state) {
@@ -38,10 +38,10 @@ export default createStore({
     setUsername(state, username) {
       state.username = username;
     },
-    setUserId(state, userID) {
+    setUserID(state, userID) {
       state.userID = userID;
     },
-    setGameId(state, gameID) {
+    setGameID(state, gameID) {
       state.gameID = gameID;
     },
     setSocket(state, socket) {

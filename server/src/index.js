@@ -9,7 +9,6 @@ import model from "./model.js";
 import userController from "./controllers/user.controller.js";
 import gameController from "./controllers/game.controller.js";
 import { requireAuth } from "./middleware/requireAuth.js";
-import history from "connect-history-api-fallback";
 import https from 'https';
 import fs from 'fs';
 
@@ -105,9 +104,9 @@ io.on("connection", (socket) => {
     resetTimeout();
   });
 
-  socket.on("logIn", ({user_id}) => {
-    console.log("User logged in:", user_id);
-    model.createSession(user_id, sessionID);
+  socket.on("logIn", ({userID}) => {
+    console.log("User logged in:", userID);
+    model.createSession(userID, sessionID);
     resetTimeout();
   });
 

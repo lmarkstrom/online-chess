@@ -1,9 +1,9 @@
 <template>
   <section class="container-fluid py-4">
-    <div v-if="user_2 === null" class="overlay">
+    <div v-if="user2 === null" class="overlay">
       <div class="overlay-content">
         <p>Waiting for player 2…</p>
-        <p><strong>Game ID:</strong> {{ game_id }}</p>
+        <p><strong>Game ID:</strong> {{ gameID }}</p>
       </div>
     </div>
     <div v-if="winner !== null" class="overlay">
@@ -14,9 +14,9 @@
         </button>
       </div>
     </div>
-    <div v-if="user_2 !== null" class="top-info">
+    <div v-if="user2 !== null" class="top-info">
       <div class="info-content">
-        <p><strong>Game ID:</strong> {{ game_id }}</p>
+        <p><strong>Game ID:</strong> {{ gameID }}</p>
         <p></p>
         <p><strong>Your Color:</strong> {{ yourColor }}</p>
         <p></p>
@@ -66,10 +66,10 @@ export default {
   name: "GameView",
   components: {},
   data: () => ({
-    game_id: null,
-    user_id: null,
-    user_1: null,
-    user_2: null,
+    gameID: null,
+    userID: null,
+    user1: null,
+    user2: null,
     currentPlayer: null,
     winner: null,
     board: [],
@@ -78,8 +78,8 @@ export default {
   }),
   computed: {
     yourColor() {
-      if (this.user_id === this.user_1) return "White";
-      if (this.user_id === this.user_2) return "Black";
+      if (this.userID === this.user1) return "White";
+      if (this.userID === this.user2) return "Black";
       return "Unknown";
     },
     turn() {
@@ -93,34 +93,34 @@ export default {
       return "Unknown";
     },
     whoIsOpponent() {
-      if (this.user_id === this.user_1) return this.user_2;
-      if (this.user_id === this.user_2) return this.user_1;
+      if (this.userID === this.user1) return this.user2;
+      if (this.userID === this.user2) return this.user1;
       return "Unknown";
     },
   },
   mounted() {
     const { getters } = this.$store;
-    this.game_id = this.$route.params.game_id;
-    this.user_id = getters.getUserId;
+    this.gameID = getters.getGameID;
+    this.userID = getters.getUserID;
     this.socket = getters.getSocket;
-    console.log("Mount game: ", this.game_id);
-    console.log("User ID:", this.user_id);
-    this.fetchGame(this.game_id);
-    socket.on("gameUpdate", (data) => {
+    console.log("Mount game: ", this.gameID);
+    console.log("User ID:", this.userID);
+    this.fetchGame(this.gameID);
+    this.socket.on("gameUpdate", (data) => {
       this.board = data.board;
       this.moveHistory = data.moveHistory;
       this.currentPlayer = data.currentPlayer;
-      this.user_1 = data.user_1;
-      this.user_2 = data.user_2;
+      this.user1 = data.user1;
+      this.user2 = data.user2;
     });
     this.emitUpdate();
-    socket.on("sessionTimeout", () => {
+    this.socket.on("sessionTimeout", () => {
       console.log("sessionTimeout");
       this.logout();
     });
     console.log(this.currentPlayer);
     console.log(this.turn);
-    socket.on("gameOver", (msg) => {
+    this.socket.on("gameOver", (msg) => {
       console.log("gameOver");
       console.log(msg.winner);
       this.winner = msg.winner;
@@ -128,27 +128,27 @@ export default {
   },
   methods: {
     async fetchGame() {
-      fetch(`/game/${this.game_id}/fetchGameData`, {
+      fetch(`/game/${this.gameID}/fetchGameData`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ game_id: this.game_id }),
+        body: JSON.stringify({ gameID: this.gameID }),
       })
         .then((res) => res.json())
         .then((data) => {
-          this.user_1 = data.user_1;
-          this.user_2 = data.user_2;
+          this.user1 = data.user1;
+          this.user2 = data.user2;
           this.currentPlayer = data.currentPlayer;
           this.board = data.board;
           this.moveHistory = data.moveHistory;
           console.log("Game curr: ", this.currentPlayer);
           console.log("Game turn: ", this.turn);
-          console.log("user_id: ", this.user_id);
-          console.log("user_1: ", this.user_1);
-          console.log("user_2: ", this.user_2);
-          console.log("user_1: ", data.user_1);
-          console.log("user_2: ", data.user_2);
+          console.log("user_id: ", this.userID);
+          console.log("user_1: ", this.user1);
+          console.log("user_2: ", this.user2);
+          console.log("user_1: ", data.user1);
+          console.log("user_2: ", data.user2);
         });
     },
     async handleClick(row, col) {
@@ -160,19 +160,14 @@ export default {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          game_id: this.game_id,
+          gameID: this.gameID,
           row,
           col,
-          user_id: this.user_id,
+          userID: this.userID,
           opponent: this.whoIsOpponent,
           playerColor: this.yourPlayerColor,
         }),
       });
-            const data = await res.json();
-            this.board = data.board;
-            this.moveHistory = data.moveHistory;
-            this.currentPlayer = data.currentPlayer;
-
       const data = await res.json();
       this.board = data.board;
       this.moveHistory = data.moveHistory;
@@ -184,7 +179,7 @@ export default {
     },
     emitUpdate() {
       console.log("emitUpdate");
-      socket.emit("updateTime");
+      this.socket.emit("updateTime");
     },
     logout() {
       const { commit } = this.$store;
@@ -220,7 +215,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-
+}
 
 /* Main container */
 #app {

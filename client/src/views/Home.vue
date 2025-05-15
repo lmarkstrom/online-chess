@@ -16,7 +16,7 @@
           class="card mb-3 shadow-sm"
         >
           <div class="card-body">
-            <h5 class="card-title fw-bold">{{ game.game_name }}</h5>
+            <h5 class="card-title fw-bold">{{ game.gameName }}</h5>
             <p class="card-text mb-1">
               Host: <strong>{{ game.host }}</strong>
             </p>
@@ -38,7 +38,7 @@
         </div>
         <div v-for="game in myGames" :key="game.id" class="card mb-3 shadow-sm">
           <div class="card-body">
-            <h5 class="card-title fw-bold">{{ game.game_name }}</h5>
+            <h5 class="card-title fw-bold">{{ game.gameName }}</h5>
             <p class="card-text mb-1">
               Host: <strong>{{ game.host }}</strong>
             </p>
@@ -64,7 +64,7 @@
           <label for="gameName">Game Name:</label>
           <input
             id="gameName"
-            v-model="game_name"
+            v-model="gameName"
             type="text"
             class="form-control"
             placeholder="Enter game name..."
@@ -80,16 +80,15 @@
 </template>
 
 <script>
-import { io } from "socket.io-client";
 
 export default {
   name: "HomePage",
   components: {},
   data: () => ({
     username: "",
-    user_id: null,
+    userID: null,
     open_games: [],
-    game_name: "",
+    gameName: "",
     kickTimer: null,
     winratio: null,
     socket: null,
@@ -97,30 +96,30 @@ export default {
   computed: {
     openGames() {
       return this.open_games.filter(
-        (game) => game.user_2 === null && game.user_1 !== this.user_id
+        (game) => game.user2 === null && game.user1 !== this.userID
       );
     },
     myGames() {
       return this.open_games.filter(
-        (game) => game.user_1 === this.user_id || game.user_2 === this.user_id
+        (game) => game.user1 === this.userID || game.user2 === this.userID
       );
     },
   },
   mounted() {
     const { getters } = this.$store;
     this.username = getters.getUsername;
-    this.user_id = getters.getUserId;
+    this.userID = getters.getUserID;
     this.socket = getters.getSocket;
-    console.log("User ID:", this.user_id);
+    console.log("User ID:", this.userID);
     this.fetchGames();
     this.fetchWinRatio();
-    socket.on("gamelistUpdate", () => {
+    this.socket.on("gamelistUpdate", () => {
       this.$nextTick(() => {
         this.fetchGames();
       });
     });
     this.emitUpdate();
-    socket.on("sessionTimeout", () => {
+    this.socket.on("sessionTimeout", () => {
       console.log("sessionTimeout");
       this.logout();
     });
@@ -133,7 +132,7 @@ export default {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user_id: this.user_id }),
+        body: JSON.stringify({ user: this.userID }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -147,7 +146,7 @@ export default {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user_id: this.user_id }),
+        body: JSON.stringify({ userID: this.userID }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -159,16 +158,16 @@ export default {
       const { push } = this.$router;
       const { commit } = this.$store;
       console.log("Creates new game");
-      console.log("Game name:", this.user_id);
+      console.log("Game name:", this.userID);
       const id = await fetch("/home/newGame", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           },
         body: JSON.stringify({
-          user_1: this.user_id,
+          user1: this.userID,
           username: this.username,
-          game_name: this.game_name,
+          gameName: this.gameName,
         }),
       })
         .then((res) => res.json())
@@ -176,7 +175,8 @@ export default {
           console.log("Game created:", data);
           return data.gameID;
         });
-      commit("setGameId", id);
+      console.log("Game ID:", id);
+      commit("setGameID", id);
       push(`/game/${id}`);
     },
     emitUpdate() {
@@ -205,14 +205,14 @@ export default {
         })
     },
     getStatus(game) {
-      if (game.user_2 === null) {
+      if (game.user2 === null) {
         return "Waiting for player 2...";
       }
       return "Game started!";
     },
     emitUpdate() {
       console.log("emitUpdate");
-      socket.emit("updateTime");
+      this.socket.emit("updateTime");
     },
     logout() {
       const { commit } = this.$store;
@@ -245,14 +245,14 @@ export default {
         },
         body: JSON.stringify({
           gameID,
-          user_id: this.user_id,
+          userID: this.userID,
           username: this.username,
         }),
       })
         .then((res) => res.json())
         .then((data) => {
           console.log("Game joined:", data.success);
-          commit("setGameId", gameID);
+          commit("setGameID", gameID);
           push(`/game/${gameID}`);
         });
     },
@@ -260,7 +260,7 @@ export default {
       const { push } = this.$router;
       const { commit } = this.$store;
       console.log("Open game:", gameID);
-      commit("setGameId", gameID);
+      commit("setGameID", gameID);
       push(`/game/${gameID}`);
     },
   },

@@ -9,7 +9,7 @@ const privateRouter = Router();
 privateRouter.post("/:gameID/fetchGameData", (req, res) => {
   const { gameID } = req.params;
   const game = model.findGameById(gameID);
-  console.log("Game fetched", game.currentPlayer);
+  console.log("Game fetched", game);
   res.send({
     currentPlayer: game.currentPlayer,
     user1: game.user1,
@@ -43,9 +43,10 @@ privateRouter.post("/newGame", async (req, res) => {
   const newGame = new Chess();
   const boardString = JSON.stringify(newGame.board);
   const historyString = JSON.stringify(newGame.moveHistory);
+  console.log("New game player", newGame.currentPlayer);
   let gameID = null;
   await db.run(
-    "INSERT INTO games (gameName, host, opponent, user1, user2, game_board, game_history, current_player, current_piece, winner, check_, enpassant) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    "INSERT INTO games (gameName, host, opponent, user1, user2, gameBoard, gameHistory, currentPlayer, currentPiece, winner, checker, enpassant) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     [
       gameName,
       username,
@@ -84,8 +85,8 @@ privateRouter.post("/newGame", async (req, res) => {
 });
 
 publicRouter.post("/move", async (req, res) => {
-    const { row, col, game_id, user_id, opponent, playerColor } = req.body;
-    const game = model.findGameById(game_id);
+    const { row, col, gameID, userID, opponent, playerColor } = req.body;
+    const game = model.findGameById(gameID);
     if(playerColor !== game.currentPlayer) {
       return res.json({
         board: game.board,
@@ -94,11 +95,11 @@ publicRouter.post("/move", async (req, res) => {
       });
     }
     game.handleUserClick(row, col);
-    model.updateGame(game, game_id);
+    model.updateGame(game, gameID);
     model.broadcastGameUpdate(game);  
-    const board_string = JSON.stringify(game.board);
-    const history_string = JSON.stringify(game.moveHistory);
-    const enpassant_string = JSON.stringify(game.enpassant);
+    const boardString = JSON.stringify(game.board);
+    const historyString = JSON.stringify(game.moveHistory);
+    const enpassantString = JSON.stringify(game.enpassant);
 
     if(game.gameOver) {
       model.broadcastWin(game.winner)
@@ -106,34 +107,12 @@ publicRouter.post("/move", async (req, res) => {
     const gameWinner = null;
     let winner = null;
     if(game.winner !== null) {
-      winner = user_id;
-      model.incrementUserStats(user_id, game.winner, opponent);
+      winner = userID;
+      model.incrementUserStats(userID, game.winner, opponent);
     }
-}
-
-publicRouter.post("/move", async (req, res) => {
-  const { row, col, gameID, userID, opponent } = req.body;
-  const game = model.findGameById(gameID);
-  console.log(game.currentPiece);
-  console.log(game.currentPiece);
-  game.handleUserClick(row, col);
-  model.updateGame(game, gameID);
-  model.broadcastGameUpdate(game);
-  const boardString = JSON.stringify(game.board);
-  const historyString = JSON.stringify(game.moveHistory);
-  const enpassantString = JSON.stringify(game.enpassant);
-
-  if (game.gameOver) {
-    model.broadcastWin(game.winner);
-  }
-  let winner = null;
-  if (game.winner !== null) {
-    winner = userID;
-    model.incrementUserStats(userID, game.winner, opponent);
-  }
 
   await db.run(
-    "UPDATE games SET game_board = ?, game_history = ?, current_player = ?, winner = ?, check_ = ?, enpassant = ? WHERE id = ?",
+    "UPDATE games SET gameBoard = ?, gameHistory = ?, currentPlayer = ?, winner = ?, checker = ?, enpassant = ? WHERE id = ?",
     [
       boardString,
       historyString,

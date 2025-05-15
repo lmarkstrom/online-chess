@@ -2,7 +2,6 @@ import { Router } from "express";
 import pkg from "bcrypt";
 import model from "../model.js";
 import db from "../db.js";
-import pkg from "bcrypt";
 import { io } from "../index.js";
 const bcrypt = pkg;
 
@@ -74,7 +73,7 @@ publicRouter.post("/register", async (req, res) => {
     const user = model.findUserByName(username);
     if (user !== null) {
       console.log("User already exists");
-      return res.status(401).send(String(0));
+      return res.status(401).send(String(-1));
     }
 
     const saltRounds = 10;
@@ -87,6 +86,10 @@ publicRouter.post("/register", async (req, res) => {
       model.createSession(userRes.id, id);
       return res.cookie("session-id", id).json({ success: true, userId: userRes, username });
     });
+  } catch (error) {
+    console.error("Error during registration", error);
+    return res.status(401).send(String(-1));
+  }
 });
 
 export default { publicRouter, privateRouter };
