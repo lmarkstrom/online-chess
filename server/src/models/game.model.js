@@ -1,6 +1,7 @@
 import { Chess, EnPassant } from "./chess.js";
 import { Pawn, Rook, Knight, Bishop, Queen, King } from "./piece.js";
 
+
 class Game extends Chess {
   constructor(
     id,
@@ -33,15 +34,6 @@ class Game extends Chess {
     this.enpassant = enpassantText
       ? this.buildEnPassant(this.parseString(enpassantText))
       : new EnPassant();
-    console.log(
-      "Game created",
-      this.id,
-      this.moveHistory,
-      this.currentPlayer,
-      this.currentPiece,
-      this.winner,
-      this.check
-    );
   }
 
   static parseString(text) {

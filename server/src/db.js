@@ -9,6 +9,5 @@ const db = await open({
   driver: sqlite3.Database,
 });
 
-console.log(db);
-
 export default db;
+

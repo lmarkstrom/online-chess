@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import { io } from "socket.io-client";
+
 export default {
   name: "LoginView",
   components: {},
@@ -61,9 +63,12 @@ export default {
         .then((res) => res.json())
         .then((data) => {
           if (data !== -1) {
+            const socket = io("https://localhost:8989");
             commit("setAuthenticated", true);
             commit("setUsername", this.username);
             commit("setUserId", data);
+            commit("setSocket", socket);
+            socket.emit("logIn", { user_id: data });
           } else {
             this.msg = "Bad credentials!";
           }

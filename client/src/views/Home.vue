@@ -82,8 +82,6 @@
 <script>
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:8989");
-
 export default {
   name: "HomePage",
   components: {},
@@ -94,6 +92,7 @@ export default {
     game_name: "",
     kickTimer: null,
     winratio: null,
+    socket: null,
   }),
   computed: {
     openGames() {
@@ -111,6 +110,7 @@ export default {
     const { getters } = this.$store;
     this.username = getters.getUsername;
     this.user_id = getters.getUserId;
+    this.socket = getters.getSocket;
     console.log("User ID:", this.user_id);
     this.fetchGames();
     this.fetchWinRatio();
@@ -164,7 +164,7 @@ export default {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-        },
+          },
         body: JSON.stringify({
           user_1: this.user_id,
           username: this.username,
@@ -178,6 +178,31 @@ export default {
         });
       commit("setGameId", id);
       push(`/game/${id}`);
+    },
+    emitUpdate() {
+        console.log("emitUpdate");
+        this.socket.emit("updateTime");
+    },
+    logout() {
+        const { commit } = this.$store;
+        const { push } = this.$router;
+        fetch("/home/logout", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+            username: this.$store.getters.getUsername,
+            }),
+        }).then((response) => {
+            if (response.ok) {
+                commit("setAuthenticated", false);
+                console.log("Logout successful");
+                push("/login");
+            } else {
+                console.error("Logout failed");
+            }
+        })
     },
     getStatus(game) {
       if (game.user_2 === null) {

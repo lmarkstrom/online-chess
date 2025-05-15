@@ -61,9 +61,6 @@
 </template>
 
 <script>
-import { io } from "socket.io-client";
-
-const socket = io("http://localhost:8989");
 
 export default {
   name: "GameView",
@@ -77,6 +74,7 @@ export default {
     winner: null,
     board: [],
     moveHistory: [],
+    socket: null,
   }),
   computed: {
     yourColor() {
@@ -104,6 +102,7 @@ export default {
     const { getters } = this.$store;
     this.game_id = this.$route.params.game_id;
     this.user_id = getters.getUserId;
+    this.socket = getters.getSocket;
     console.log("Mount game: ", this.game_id);
     console.log("User ID:", this.user_id);
     this.fetchGame(this.game_id);
@@ -166,8 +165,13 @@ export default {
           col,
           user_id: this.user_id,
           opponent: this.whoIsOpponent,
+          playerColor: this.yourPlayerColor,
         }),
       });
+            const data = await res.json();
+            this.board = data.board;
+            this.moveHistory = data.moveHistory;
+            this.currentPlayer = data.currentPlayer;
 
       const data = await res.json();
       this.board = data.board;
@@ -216,7 +220,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-}
+
 
 /* Main container */
 #app {
@@ -260,6 +264,7 @@ body {
 .square:nth-child(even) {
   background-color: #b58863;
 }
+
 
 .square.hoverable:hover {
   background-color: rgb(0 255 0 / 40%);

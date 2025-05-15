@@ -28,7 +28,6 @@ privateRouter.post("/joinGame", async (req, res) => {
   game.opponent = username;
   game.user2 = userID;
   model.updateGame(game, gameID);
-  console.log(`Game updated ${userID} ${gameID} ${username}`);
   await db.run("UPDATE games SET opponent = ?, user2 = ? WHERE id = ?", [
     username,
     userID,
@@ -65,6 +64,7 @@ privateRouter.post("/newGame", async (req, res) => {
   await db.each("SELECT last_insert_rowid() AS id", (err, row) => {
     gameID = row.id;
   });
+
   if (gameID === null) {
     console.log("Game ID is null");
     return res.status(500).send("Error creating game");
@@ -82,6 +82,34 @@ privateRouter.post("/newGame", async (req, res) => {
   console.log(`Game created${gameID}`);
   return res.send({ gameID });
 });
+
+publicRouter.post("/move", async (req, res) => {
+    const { row, col, game_id, user_id, opponent, playerColor } = req.body;
+    const game = model.findGameById(game_id);
+    if(playerColor !== game.currentPlayer) {
+      return res.json({
+        board: game.board,
+        moveHistory: game.moveHistory,
+        currentPlayer: game.currentPlayer,
+      });
+    }
+    game.handleUserClick(row, col);
+    model.updateGame(game, game_id);
+    model.broadcastGameUpdate(game);  
+    const board_string = JSON.stringify(game.board);
+    const history_string = JSON.stringify(game.moveHistory);
+    const enpassant_string = JSON.stringify(game.enpassant);
+
+    if(game.gameOver) {
+      model.broadcastWin(game.winner)
+    }
+    const gameWinner = null;
+    let winner = null;
+    if(game.winner !== null) {
+      winner = user_id;
+      model.incrementUserStats(user_id, game.winner, opponent);
+    }
+}
 
 publicRouter.post("/move", async (req, res) => {
   const { row, col, gameID, userID, opponent } = req.body;
@@ -131,9 +159,7 @@ privateRouter.post("/fetchGames", async (req, res) => {
 
 privateRouter.post("/fetchWinRatio", async (req, res) => {
   const { userID } = req.body;
-  console.log(`Fetching win ratio for user: ${userID}`);
   const winRatio = model.getWinRatio(userID);
-  console.log(`Win ratio for user ${userID}: ${winRatio}`);
   return res.send({ winRatio });
 });
 

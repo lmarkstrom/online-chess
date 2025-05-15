@@ -9,6 +9,7 @@ export default createStore({
     opponent: null,
     times: [],
     curAssistantTime: {},
+    socket: null,
   },
   getters: {
     isAuthenticated(state) {
@@ -20,17 +21,14 @@ export default createStore({
     getUserId(state) {
       return state.userID;
     },
-    getTimes(state) {
-      return state.times;
-    },
-    getAssistantTime(state) {
-      return state.curAssistantTime;
-    },
     getOpponent(state) {
       return state.opponent;
     },
     getGameId(state) {
       return state.gameID;
+    },
+    getSocket(state) {
+      return state.socket;
     },
   },
   mutations: {
@@ -43,27 +41,13 @@ export default createStore({
     setUserId(state, userID) {
       state.userID = userID;
     },
-    addTime(state, newTime) {
-      state.times.push(newTime);
-      state.times.sort(
-        (a, b) =>
-          parseInt(a.time.replace(":", ""), 10) -
-          parseInt(b.time.replace(":", ""), 10)
-      );
-    },
-    removeTimes(state, times) {
-      state.times = state.times.filter((time) => !times.includes(time.id));
-    },
-    setAssistantTime(state, newAssistantTime) {
-      state.curAssistantTime = newAssistantTime;
-    },
     setGameId(state, gameID) {
       state.gameID = gameID;
     },
-    // setBooked(state, time){
-    //   state.times[time.id].booked = true;
-    //   state.times[time.id].booked_by = time.student;
-    // }
+    setSocket(state, socket) {
+      state.socket = socket;
+    }
+
   },
   actions: {},
   modules: {},
