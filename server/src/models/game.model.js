@@ -15,7 +15,7 @@ class Game extends Chess {
     currentPiece,
     winner,
     check,
-    enpassantText,
+    enpassantText
   ) {
     super();
     this.id = id;
@@ -35,7 +35,7 @@ class Game extends Chess {
       : new EnPassant();
   }
 
-  parseString(text) {
+  static parseString(text) {
     try {
       return JSON.parse(text);
     } catch (e) {
@@ -54,7 +54,7 @@ class Game extends Chess {
     }
   }
 
-  buildBoard(board) {
+  static buildBoard(board) {
     const newBoard = [];
     for (let i = 0; i < board.length; i += 1) {
       newBoard[i] = [];

@@ -2,7 +2,6 @@ import User from "./models/user.model.js";
 import Game from "./models/game.model.js";
 import db from "./db.js";
 import { TIMEOUT } from "./index.js";
-import session from "express-session";
 
 class Model {
   constructor() {
@@ -32,7 +31,7 @@ class Model {
         row.currentPiece,
         row.winner,
         row.checker,
-        row.enpassant,
+        row.enpassant
       );
     });
     await db.each("SELECT * FROM sessions", (err, row) => {
@@ -52,7 +51,7 @@ class Model {
                     SUM(CASE WHEN winner = ? THEN 1 ELSE 0 END) AS total_wins
                 FROM games
                 WHERE (user1 = ? OR user2 = ?) AND winner IS NOT NULL;`,
-        [userID, userID, userID],
+        [userID, userID, userID]
       );
       this.userStats[userID] = {
         totalGames: stats?.total_games || 0,
@@ -144,7 +143,7 @@ class Model {
       null,
       null,
       null,
-      null,
+      null
     );
   }
 

@@ -4,13 +4,14 @@ import expressSession from "express-session";
 import socketIOSession from "express-socket.io-session";
 import { Server } from "socket.io";
 import history from "connect-history-api-fallback";
+import https from "https";
+import fs from "fs";
 import { resolvePath } from "./util.js";
 import model from "./model.js";
 import userController from "./controllers/user.controller.js";
 import gameController from "./controllers/game.controller.js";
-import { requireAuth } from "./middleware/requireAuth.js";
-import https from "https";
-import fs from "fs";
+import requireAuth from "./middleware/requireAuth.js";
+
 
 const options = {
   key: fs.readFileSync("./certs/localhost-key.pem"),
@@ -40,7 +41,7 @@ app.use(
     header: { show: false },
     path: { show: true },
     body: { show: true },
-  }),
+  })
 );
 
 app.use(history());
@@ -58,7 +59,7 @@ io.use(
   socketIOSession(sessionConf, {
     autoSave: true,
     saveUninitialized: true,
-  }),
+  })
 );
 
 // Serve static files

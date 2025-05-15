@@ -1,6 +1,6 @@
-import model from "../model.js";
+import { model } from "../index.js";
 
-export const requireAuth = (req, res, next) => {
+const requireAuth = (req, res, next) => {
   const { id } = req.session;
   model.clearSessions();
   if (model.findSessionById(id) === undefined) {
@@ -9,3 +9,5 @@ export const requireAuth = (req, res, next) => {
   }
   next();
 };
+
+export default requireAuth;

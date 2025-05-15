@@ -206,7 +206,7 @@ export class Chess {
                       " can move to: " +
                       k +
                       ", " +
-                      l,
+                      l
                   );
                   moves.push({ row: k, col: l });
                 }
@@ -239,7 +239,7 @@ export class Chess {
                       " can attack: " +
                       k +
                       ", " +
-                      l,
+                      l
                   );
                   moves.push({ row: k, col: l });
                 }

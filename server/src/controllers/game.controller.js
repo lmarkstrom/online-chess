@@ -60,7 +60,7 @@ privateRouter.post("/newGame", async (req, res) => {
       null,
       null,
       null,
-    ],
+    ]
   );
   await db.each("SELECT last_insert_rowid() AS id", (err, row) => {
     gameID = row.id;
@@ -77,7 +77,7 @@ privateRouter.post("/newGame", async (req, res) => {
     user1,
     null,
     boardString,
-    historyString,
+    historyString
   );
   model.broadcastGamelistUpdate(model.findGameById(gameID));
   console.log(`Game created${gameID}`);
@@ -121,7 +121,7 @@ publicRouter.post("/move", async (req, res) => {
       game.check,
       enpassantString,
       gameID,
-    ],
+    ]
   );
   return res.json({
     board: game.board,

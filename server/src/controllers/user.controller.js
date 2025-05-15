@@ -44,7 +44,7 @@ publicRouter.post("/login", async (req, res) => {
           console.error("Error during password comparison", error);
           return res.status(500).send("Internal Server Error");
         }
-      },
+      }
     );
   }
 });
@@ -75,7 +75,7 @@ publicRouter.post("/register", async (req, res) => {
     const saltRounds = 10;
     bcrypt.hash(password, saltRounds, async (err, hash) => {
       const statement = await db.prepare(
-        "INSERT INTO users (username, password) VALUES (?, ?)",
+        "INSERT INTO users (username, password) VALUES (?, ?)"
       );
       statement.run(username, hash);
       statement.finalize();
