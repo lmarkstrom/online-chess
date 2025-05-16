@@ -106,12 +106,12 @@ io.on("connection", (socket) => {
   resetTimeout();
 
   socket.on("updateTime", () => {
-    console.log("Session updated");
+    // console.log("Session updated");
     resetTimeout();
   });
 
   socket.on("logIn", ({ userID }) => {
-    console.log("User logged in:", userID);
+    // console.log("User logged in:", userID);
     model.createSession(userID, sessionID);
     resetTimeout();
   });

@@ -83,7 +83,7 @@ class Model {
     Object.keys(this.sessions).forEach((id) => {
       if (!this.sessionActive(id, TIMEOUT)) {
         this.removeSession(id);
-      } else console.log(`Session active: ${id}`);
+      }
     });
   }
 
@@ -153,18 +153,13 @@ class Model {
     return 0;
   }
 
-  incrementUserStats(userID, winner, opponent) {
+  incrementUserStats(userID, opponent) {
     if (this.userStats[userID]) {
       this.userStats[userID].totalGames += 1;
-      if (userID === winner) {
-        this.userStats[userID].totalWins += 1;
-      }
+      this.userStats[userID].totalWins += 1;
     }
     if (this.userStats[opponent]) {
       this.userStats[opponent].totalGames += 1;
-      if (opponent === winner) {
-        this.userStats[opponent].totalWins += 1;
-      }
     }
   }
 

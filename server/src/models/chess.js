@@ -265,10 +265,12 @@ class Chess {
     if (this.checkCheckmate(this.currentPlayer) === "check") {
       // alert("Invalid move!");
       console.log("Invalid move, still in check!");
-      this.board[this.currentPiece.row][this.currentPiece.col] = tmp1;
+      this.board[oldRow][oldCol] = tmp1;
       this.board[row][col] = tmp2;
       tmp1.row = oldRow;
       tmp1.col = oldCol;
+      console.log(this.currentPiece);
+      console.log(this.board[oldRow][oldCol]);
       return;
     }
     console.log("Valid move!");
@@ -303,6 +305,8 @@ class Chess {
       this.board[target.row][target.col] = tmp2;
       tmp1.row = oldRow;
       tmp1.col = oldCol;
+      console.log(this.currentPiece);
+      console.log(this.board[oldRow][oldCol]);
       return;
     }
     console.log("Valid move!");
@@ -332,6 +336,8 @@ class Chess {
       this.currentPiece = tmp1;
       this.board[oldRow][oldCol] = tmp1;
       this.board[row][col] = tmp2;
+      tmp1.row = oldRow;
+      tmp1.col = oldCol;
 
       return;
     }

@@ -9,7 +9,6 @@ export default function createGameController(model) {
   privateRouter.post("/:gameID/fetchGameData", (req, res) => {
     const { gameID } = req.params;
     const game = model.findGameById(gameID);
-    console.log("Game fetched", game);
     res.send({
       currentPlayer: game.currentPlayer,
       user1: game.user1,
@@ -43,7 +42,6 @@ export default function createGameController(model) {
     const newGame = new Chess();
     const boardString = JSON.stringify(newGame.board);
     const historyString = JSON.stringify(newGame.moveHistory);
-    console.log("New game player", newGame.currentPlayer);
     let gameID = null;
     await db.run(
       "INSERT INTO games (gameName, host, opponent, user1, user2, gameBoard, gameHistory, currentPlayer, currentPiece, winner, checker, enpassant) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -80,7 +78,6 @@ export default function createGameController(model) {
       historyString
     );
     model.broadcastGamelistUpdate(model.findGameById(gameID));
-    console.log(`Game created${gameID}`);
     return res.send({ gameID });
   });
 
@@ -88,7 +85,6 @@ export default function createGameController(model) {
     const { row, col, gameID, userID, opponent, playerColor } = req.body;
     const game = model.findGameById(gameID);
     if (playerColor !== game.currentPlayer) {
-      console.log("Not your turn", game.currentPlayer, playerColor);
       return res.json({
         board: game.board,
         moveHistory: game.moveHistory,
@@ -109,7 +105,7 @@ export default function createGameController(model) {
     let winner = null;
     if (game.winner !== null) {
       winner = userID;
-      model.incrementUserStats(userID, game.winner, opponent);
+      model.incrementUserStats(userID, opponent);
     }
 
     await db.run(
@@ -124,11 +120,7 @@ export default function createGameController(model) {
         gameID,
       ]
     );
-    return res.json({
-      board: game.board,
-      moveHistory: game.moveHistory,
-      currentPlayer: game.currentPlayer,
-    });
+    return res.json(game);
   });
 
   privateRouter.post("/fetchGames", async (req, res) => {
