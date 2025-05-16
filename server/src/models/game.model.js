@@ -24,18 +24,18 @@ class Game extends Chess {
     this.opponent = opponent;
     this.user1 = user1;
     this.user2 = user2;
-    this.board = this.buildBoard(this.parseString(boardText));
-    this.moveHistory = this.parseString(historyText);
+    this.board = Game.buildBoard(Game.parseString(boardText));
+    this.moveHistory = Game.parseString(historyText);
     this.currentPlayer = currentPlayer;
     this.currentPiece = currentPiece;
     this.winner = winner;
     this.check = !!check;
     this.enpassant = enpassantText
-      ? this.buildEnPassant(this.parseString(enpassantText))
+      ? this.buildEnPassant(Game.parseString(enpassantText))
       : new EnPassant();
   }
 
-  parseString(text) {
+  static parseString(text) {
     try {
       return JSON.parse(text);
     } catch (e) {
@@ -54,7 +54,7 @@ class Game extends Chess {
     }
   }
 
-  buildBoard(board) {
+  static buildBoard(board) {
     const newBoard = [];
     for (let i = 0; i < board.length; i += 1) {
       newBoard[i] = [];

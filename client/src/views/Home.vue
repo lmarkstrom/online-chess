@@ -178,10 +178,6 @@ export default {
       commit("setGameID", id);
       push(`/game/${id}`);
     },
-    emitUpdate() {
-      console.log("emitUpdate");
-      this.socket.emit("updateTime");
-    },
     logout() {
       const { commit } = this.$store;
       const { push } = this.$router;
@@ -212,27 +208,6 @@ export default {
     emitUpdate() {
       console.log("emitUpdate");
       this.socket.emit("updateTime");
-    },
-    logout() {
-      const { commit } = this.$store;
-      const { push } = this.$router;
-      fetch("/home/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: this.$store.getters.getUsername,
-        }),
-      }).then((response) => {
-        if (response.ok) {
-          commit("setAuthenticated", false);
-          console.log("Logout successful");
-          push("/login");
-        } else {
-          console.error("Logout failed");
-        }
-      });
     },
     joinGame(gameID) {
       const { push } = this.$router;

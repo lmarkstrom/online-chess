@@ -1,7 +1,6 @@
 import User from "./models/user.model.js";
 import Game from "./models/game.model.js";
 import db from "./db.js";
-import { TIMEOUT } from "./index.js";
 
 class Model {
   constructor() {
@@ -10,10 +9,12 @@ class Model {
     this.sessions = {};
     this.userStats = {};
     this.io = undefined;
+    this.TIMEOUT = 0;
   }
 
-  async init(io) {
+  async init(io, timeout) {
     this.io = io;
+    this.TIMEOUT = timeout;
     await db.each("SELECT * FROM users", (err, row) => {
       this.users[row.id] = new User(row.id, row.username);
     });
@@ -37,27 +38,23 @@ class Model {
     await db.each("SELECT * FROM sessions", (err, row) => {
       this.sessions[row.id] = { userID: row.userID, time: row.time };
     });
-    this.clearSessions();
-    const users = await db.all("SELECT id FROM users;", (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
-    for (const user of users) {
+    this.clearSessions(this.TIMEOUT);
+    const users = await db.all("SELECT id FROM users;");
+    users.forEach(async (user) => {
       const userID = user.id;
-
       const stats = await db.get(
         `SELECT 
-                    COUNT(*) AS total_games,
-                    SUM(CASE WHEN winner = ? THEN 1 ELSE 0 END) AS total_wins
-                FROM games
-                WHERE (user1 = ? OR user2 = ?) AND winner IS NOT NULL;`,
+          COUNT(*) AS total_games,
+          SUM(CASE WHEN winner = ? THEN 1 ELSE 0 END) AS total_wins
+        FROM games
+        WHERE (user1 = ? OR user2 = ?) AND winner IS NOT NULL;`,
         [userID, userID, userID]
       );
       this.userStats[userID] = {
         totalGames: stats?.total_games || 0,
         totalWins: stats?.total_wins || 0,
       };
-    }
+    });
   }
 
   findGameById(id) {
@@ -69,12 +66,7 @@ class Model {
   }
 
   findUserByName(username) {
-    for (const id in this.users) {
-      if (this.users[id].username === username) {
-        return this.users[id];
-      }
-    }
-    return null;
+    return Object.values(this.users).find((user) => user.username === username);
   }
 
   createSession(userID, id) {
@@ -87,15 +79,15 @@ class Model {
     return id;
   }
 
-  clearSessions() {
-    for (const id in this.sessions) {
-      if (!this.sessionActive(id)) {
+  clearSessions(TIMEOUT) {
+    Object.keys(this.sessions).forEach((id) => {
+      if (!this.sessionActive(id, TIMEOUT)) {
         this.removeSession(id);
       } else console.log(`Session active: ${id}`);
-    }
+    });
   }
 
-  sessionActive(id) {
+  sessionActive(id, TIMEOUT) {
     if (this.sessions[id]) {
       const session = this.sessions[id];
       const now = new Date();
@@ -115,17 +107,10 @@ class Model {
   }
 
   getGamesForUser(userID) {
-    const games = [];
-    for (const id in this.games) {
-      if (
-        this.games[id].user1 === userID ||
-        this.games[id].user2 === userID ||
-        this.games[id].user2 === null
-      ) {
-        games.push(this.games[id]);
-      }
-    }
-    return games;
+    return Object.values(this.games).filter(
+      (game) =>
+        game.user1 === userID || game.user2 === userID || game.user2 === null
+    );
   }
 
   findSessionById(id) {

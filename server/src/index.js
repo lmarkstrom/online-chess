@@ -8,9 +8,9 @@ import https from "https";
 import fs from "fs";
 import { resolvePath } from "./util.js";
 import model from "./model.js";
-import userController from "./controllers/user.controller.js";
-import gameController from "./controllers/game.controller.js";
 import requireAuth from "./middleware/requireAuth.js";
+import createGameController from "./controllers/game.controller.js";
+import createUserController from "./controllers/user.controller.js";
 
 const options = {
   key: fs.readFileSync("./certs/localhost-key.pem"),
@@ -69,16 +69,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Controllers
-app.use(userController.publicRouter);
-app.use(gameController.publicRouter);
-app.use("/game", userController.publicRouter);
-app.use("/home", userController.publicRouter);
-app.use("/home", requireAuth, userController.privateRouter);
-app.use("/home", requireAuth, gameController.privateRouter);
-app.use("/game", requireAuth, gameController.privateRouter);
+app.use(createUserController(io, model).publicRouter);
+app.use(createGameController(model).publicRouter);
+app.use("/game", createUserController(io, model).publicRouter);
+app.use("/home", createUserController(io, model).publicRouter);
+app.use(
+  "/home",
+  requireAuth(model),
+  createUserController(io, model).privateRouter
+);
+app.use("/home", requireAuth(model), createGameController(model).privateRouter);
+app.use("/game", requireAuth(model), createGameController(model).privateRouter);
 
 // Initialize a model
-model.init(io);
+model.init(io, TIMEOUT);
 
 export { model };
 

@@ -1,6 +1,4 @@
-import { model } from "../index.js";
-
-const requireAuth = (req, res, next) => {
+const requireAuth = (model) => (req, res, next) => {
   const { id } = req.session;
   model.clearSessions();
   if (model.findSessionById(id) === undefined) {

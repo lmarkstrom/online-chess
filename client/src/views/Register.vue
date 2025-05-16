@@ -44,19 +44,19 @@ export default {
         !this.form.password ||
         !this.form.passwordcheck
       ) {
-        alert("Please fill in all fields.");
+        console.error("Please fill in all fields.");
         return;
       }
       const regex = /^(?=.*[A-Za-z])(?=.*\d).{3,}$/;
 
       if (this.form.password !== this.form.passwordcheck) {
-        alert("Passwords do not match!");
+        console.error("Passwords do not match!");
         return;
       }
       if (
         !(regex.test(this.form.password) && regex.test(this.form.passwordcheck))
       ) {
-        alert("Password does not match regex lol");
+        console.error("Password does not match regex lol");
         return;
       }
 
@@ -81,7 +81,7 @@ export default {
               push("/home");
             } else {
               console.error("Registration failed:", data.error);
-              alert("Registration failed");
+              console.error("Registration failed");
             }
           });
       } catch (error) {
