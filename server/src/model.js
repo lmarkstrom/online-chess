@@ -102,6 +102,7 @@ class Model {
   }
 
   async updateSession(id) {
+    if(!this.sessions[id]) return;
     this.sessions[id].time = new Date();
     await db.run("UPDATE sessions SET time = ? WHERE id = ?", [
       this.sessions[id].time,
