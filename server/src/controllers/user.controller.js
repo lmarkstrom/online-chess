@@ -33,13 +33,13 @@ export default function createUserController(io, model) {
           }
           try {
             const result = await bcrypt.compare(password, row.password);
-
+            
             if (!result) {
               console.log("Password is incorrect");
               return res.status(401).send(String(-1));
             }
 
-            model.createSession(username, id);
+            model.createSession(row.id, id);
 
             return res.cookie("session-id", id).send(String(user.id));
           } catch (error) {
