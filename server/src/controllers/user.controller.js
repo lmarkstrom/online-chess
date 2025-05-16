@@ -69,7 +69,8 @@ export default function createUserController(io, model) {
       const { id } = req.session;
 
       const user = model.findUserByName(username);
-      if (user !== null) {
+      console.log("User found", user);
+      if (user !== undefined) {
         console.log("User already exists");
         return res.status(401).send(String(-1));
       }
