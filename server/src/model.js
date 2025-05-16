@@ -40,22 +40,21 @@ class Model {
     });
     this.clearSessions(this.TIMEOUT);
     const users = await db.all("SELECT id FROM users;");
-    for (const user of users) {
+    users.forEach(async (user) => {
       const userID = user.id;
-
       const stats = await db.get(
         `SELECT 
-                    COUNT(*) AS total_games,
-                    SUM(CASE WHEN winner = ? THEN 1 ELSE 0 END) AS total_wins
-                FROM games
-                WHERE (user1 = ? OR user2 = ?) AND winner IS NOT NULL;`,
+          COUNT(*) AS total_games,
+          SUM(CASE WHEN winner = ? THEN 1 ELSE 0 END) AS total_wins
+        FROM games
+        WHERE (user1 = ? OR user2 = ?) AND winner IS NOT NULL;`,
         [userID, userID, userID]
       );
       this.userStats[userID] = {
         totalGames: stats?.total_games || 0,
         totalWins: stats?.total_wins || 0,
       };
-    }
+    });
   }
 
   findGameById(id) {
@@ -67,12 +66,7 @@ class Model {
   }
 
   findUserByName(username) {
-    for (const id in this.users) {
-      if (this.users[id].username === username) {
-        return this.users[id];
-      }
-    }
-    return null;
+    return Object.values(this.users).find((user) => user.username === username);
   }
 
   createSession(userID, id) {
@@ -86,11 +80,11 @@ class Model {
   }
 
   clearSessions(TIMEOUT) {
-    for (const id in this.sessions) {
+    Object.keys(this.sessions).forEach((id) => {
       if (!this.sessionActive(id, TIMEOUT)) {
         this.removeSession(id);
       } else console.log(`Session active: ${id}`);
-    }
+    });
   }
 
   sessionActive(id, TIMEOUT) {
@@ -113,17 +107,10 @@ class Model {
   }
 
   getGamesForUser(userID) {
-    const games = [];
-    for (const id in this.games) {
-      if (
-        this.games[id].user1 === userID ||
-        this.games[id].user2 === userID ||
-        this.games[id].user2 === null
-      ) {
-        games.push(this.games[id]);
-      }
-    }
-    return games;
+    return Object.values(this.games).filter(
+      (game) =>
+        game.user1 === userID || game.user2 === userID || game.user2 === null
+    );
   }
 
   findSessionById(id) {

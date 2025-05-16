@@ -1,8 +1,10 @@
 import { Router } from "express";
 import pkg from "bcrypt";
+import { promisify } from "util";
 import db from "../db.js";
 
 const bcrypt = pkg;
+const hashAsync = promisify(bcrypt.hash);
 
 export default function createUserController(io, model) {
   const publicRouter = Router();
@@ -52,12 +54,12 @@ export default function createUserController(io, model) {
   publicRouter.post("/logout", async (req, res) => {
     const { id } = req.session;
     model.removeSession(id);
-    const socket = await io.fetchSockets();
-    for (const s of socket) {
+    const sockets = await io.fetchSockets();
+    sockets.forEach((s) => {
       if (s.handshake?.session?.id === id) {
         s.disconnect(true);
       }
-    }
+    });
     res.clearCookie("session-id").send("ok");
   });
 
@@ -73,24 +75,26 @@ export default function createUserController(io, model) {
       }
 
       const saltRounds = 10;
-      bcrypt.hash(password, saltRounds, async (err, hash) => {
-        const statement = await db.prepare(
-          "INSERT INTO users (username, password) VALUES (?, ?)"
-        );
-        statement.run(username, hash);
-        statement.finalize();
-        const userRes = await db.get("SELECT * FROM users WHERE username = ?", [
-          username,
-        ]);
-        model.addUser(userRes.id, username);
-        model.createSession(userRes.id, id);
-        return res
-          .cookie("session-id", id)
-          .json({ success: true, userId: userRes, username });
-      });
+      const hash = await hashAsync(password, saltRounds);
+
+      const statement = await db.prepare(
+        "INSERT INTO users (username, password) VALUES (?, ?)"
+      );
+      statement.run(username, hash);
+      statement.finalize();
+
+      const userRes = await db.get("SELECT * FROM users WHERE username = ?", [
+        username,
+      ]);
+      model.addUser(userRes.id, username);
+      model.createSession(userRes.id, id);
+
+      return res
+        .cookie("session-id", id)
+        .json({ success: true, userId: userRes.id, username });
     } catch (error) {
       console.error("Error during registration", error);
-      return res.status(401).send(String(-1));
+      return res.status(500).send("Internal Server Error");
     }
   });
 
