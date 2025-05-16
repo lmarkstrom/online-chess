@@ -95,6 +95,7 @@ io.on("connection", (socket) => {
 
   const resetTimeout = () => {
     clearTimeout(timeout);
+    updateSession(sessionID);
     timeout = setTimeout(() => {
       socket.emit("sessionTimeout");
       console.log("Session timed out:", sessionID);

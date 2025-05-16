@@ -101,6 +101,14 @@ class Model {
     return false;
   }
 
+  async updateSession(id) {
+    this.sessions[id].time = new Date();
+    await db.run("UPDATE sessions SET time = ? WHERE id = ?", [
+      this.sessions[id].time,
+      id,
+    ]);
+  }
+
   removeSession(userID) {
     delete this.sessions[userID];
     db.run("DELETE FROM sessions WHERE id = ?", [userID]);
