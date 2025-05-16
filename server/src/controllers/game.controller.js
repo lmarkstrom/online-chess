@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { Chess } from "../models/chess.js";
+import Chess from "../models/chess.js";
 import db from "../db.js";
 
 export default function createGameController(model) {

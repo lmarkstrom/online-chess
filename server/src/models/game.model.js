@@ -1,5 +1,11 @@
-import { Chess, EnPassant } from "./chess.js";
-import { Pawn, Rook, Knight, Bishop, Queen, King } from "./piece.js";
+import Chess from "./chess.js";
+import EnPassant from "./chess/enpassant.js";
+import Pawn from "./chess/pawn.js";
+import Rook from "./chess/rook.js";
+import Knight from "./chess/knight.js";
+import Bishop from "./chess/bishop.js";
+import Queen from "./chess/queen.js";
+import King from "./chess/king.js";
 
 class Game extends Chess {
   constructor(

@@ -33,7 +33,7 @@ export default function createUserController(io, model) {
           }
           try {
             const result = await bcrypt.compare(password, row.password);
-            
+
             if (!result) {
               console.log("Password is incorrect");
               return res.status(401).send(String(-1));

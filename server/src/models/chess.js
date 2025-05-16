@@ -1,16 +1,12 @@
-import { Pawn, Rook, Knight, Bishop, Queen, King } from "./piece.js";
+import EnPassant from "./chess/enpassant.js";
+import Pawn from "./chess/pawn.js";
+import Rook from "./chess/rook.js";
+import Knight from "./chess/knight.js";
+import Bishop from "./chess/bishop.js";
+import Queen from "./chess/queen.js";
+import King from "./chess/king.js";
 
-// const boardHolder = document.getElementById("board");
-
-export class EnPassant {
-  constructor() {
-    this.color = null;
-    this.pos = null;
-    this.move = null;
-  }
-}
-
-export class Chess {
+class Chess {
   constructor() {
     this.board = [];
     this.currentPlayer = "w";
@@ -335,7 +331,7 @@ export class Chess {
       console.log("Invalid move, still in check!");
       this.currentPiece = tmp1;
       this.board[oldRow][oldCol] = tmp1;
-      this.board[target.row][target.col] = tmp2;
+      this.board[row][col] = tmp2;
 
       return;
     }
@@ -424,3 +420,5 @@ export class Chess {
     }
   }
 }
+
+export default Chess;
